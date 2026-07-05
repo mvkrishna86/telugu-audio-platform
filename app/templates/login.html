@@ -2,8 +2,7 @@
 {% block title %}లాగిన్ — తెలుగు వినండి{% endblock %}
 
 {% block head %}
-<!-- Supabase JS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -51,7 +50,8 @@
 
 {% block scripts %}
 <script>
-const supabase = window.supabase.createClient('{{ supabase_url }}', '{{ supabase_anon_key }}');
+const { createClient } = window.supabase;
+const supabase = createClient('{{ supabase_url }}', '{{ supabase_anon_key }}');
 
 async function finishLogin(session) {
   const user = session.user;
