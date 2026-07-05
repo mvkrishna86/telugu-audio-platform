@@ -41,4 +41,5 @@ def sync_user_to_db(supabase_uid: str, name: str, email: str, avatar_url: str) -
         """,
         (supabase_uid, name, email, avatar_url),
     )
-    return row
+    # Convert uuid/date objects to strings so the session can be JSON-serialised
+    return {k: str(v) if v is not None else None for k, v in row.items()}

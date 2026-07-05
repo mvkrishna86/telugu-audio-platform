@@ -26,12 +26,11 @@ async def login_page(request: Request):
 
 @router.get("/auth/callback", response_class=HTMLResponse)
 async def auth_callback(request: Request):
-    """
-    After Supabase OAuth / OTP, the browser lands here with the session
-    in the URL fragment (#access_token=...). A small JS snippet in the
-    template exchanges it and POSTs the user info to /auth/session.
-    """
-    return templates.TemplateResponse("auth_callback.html", {"request": request})
+    return templates.TemplateResponse("auth_callback.html", {
+        "request": request,
+        "supabase_url": SUPABASE_URL,
+        "supabase_anon_key": SUPABASE_ANON_KEY,
+    })
 
 
 @router.post("/auth/session")

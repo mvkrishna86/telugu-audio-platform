@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="te">
-<head><meta charset="UTF-8" /><title>లాగిన్ అవుతోంది...</title></head>
+<head>
+  <meta charset="UTF-8" />
+  <title>లాగిన్ అవుతోంది...</title>
+</head>
 <body>
 <p>దయచేసి వేచి ఉండండి...</p>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (async () => {
-  // Supabase puts the session in the URL fragment after OAuth redirect
+  const SUPABASE_URL = "{{ supabase_url }}";
+  const SUPABASE_ANON_KEY = "{{ supabase_anon_key }}";
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    window.location.href = '/login';
+    return;
+  }
+
   const { createClient } = window.supabase;
-  const sb = createClient(
-    document.querySelector('meta[name=sb-url]')?.content || window.__SB_URL__,
-    document.querySelector('meta[name=sb-key]')?.content || window.__SB_KEY__
-  );
-  // getSession() reads from the fragment automatically
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const { data } = await sb.auth.getSession();
-  if (!data.session) { window.location.href = '/login'; return; }
+  if (!data.session) {
+    window.location.href = '/login';
+    return;
+  }
+
   const user = data.session.user;
   const meta = user.user_metadata || {};
   await fetch('/auth/session', {
