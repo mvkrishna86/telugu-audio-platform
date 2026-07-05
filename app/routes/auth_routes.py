@@ -2,7 +2,6 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.db import get_db
 from app.auth import sync_user_to_db
 from app.config import SUPABASE_URL, SUPABASE_ANON_KEY, APP_BASE_URL
 
