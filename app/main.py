@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import APP_SECRET_KEY
@@ -18,6 +18,11 @@ app.include_router(content.router)
 app.include_router(search.router)
 app.include_router(library.router)
 app.include_router(admin.router)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("app/static/icons/icon-192.png")
 
 
 @app.exception_handler(401)
