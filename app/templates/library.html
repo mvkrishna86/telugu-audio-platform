@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}నా లైబ్రరీ — తెలుగు వినండి{% endblock %}
+
+{% block content %}
+<section class="section">
+  <h1 class="section-title">📚 నా లైబ్రరీ</h1>
+
+  <!-- Continue Listening -->
+  {% if history %}
+  <h2>కొనసాగించండి</h2>
+  <div class="content-grid">
+    {% for h in history %}
+    {% set af = h.audio_files %}
+    {% set c = af.content %}
+    <a href="/content/{{ c.id }}" class="content-card">
+      <img src="{{ c.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ c.title_te }}" />
+      <div class="card-info">
+        <div class="card-title">{{ c.title_te }}</div>
+        <div class="card-meta">{{ (h.position_sec // 60) }}:{{ '%02d' % (h.position_sec % 60) }} వద్ద ఆపబడింది</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Bookmarks -->
+  {% if bookmarks %}
+  <h2>నా బుక్‌మార్క్‌లు ♥</h2>
+  <div class="content-grid">
+    {% for b in bookmarks %}
+    {% set c = b.content %}
+    <a href="/content/{{ c.id }}" class="content-card">
+      <img src="{{ c.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ c.title_te }}" />
+      <div class="card-info">
+        <div class="card-title">{{ c.title_te }}</div>
+        <div class="card-meta">{{ c.type }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not history and not bookmarks %}
+  <p class="empty-msg">మీ లైబ్రరీ ఖాళీగా ఉంది. కంటెంట్ వినడం ప్రారంభించండి!</p>
+  {% endif %}
+</section>
+{% endblock %}

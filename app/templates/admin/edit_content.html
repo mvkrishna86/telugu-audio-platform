@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}కంటెంట్ సవరించు{% endblock %}
+
+{% block content %}
+<section class="section admin-section">
+  <h1>కంటెంట్ సవరించు</h1>
+
+  <div class="edit-actions">
+    <form action="/admin/content/{{ content.id }}/publish" method="post" style="display:inline">
+      <button type="submit" class="btn-primary">
+        {{ 'అన్‌పబ్లిష్ చేయండి' if content.is_published else 'ప్రచురించండి' }}
+      </button>
+    </form>
+    <form action="/admin/content/{{ content.id }}/delete" method="post" style="display:inline"
+          onsubmit="return confirm('ఈ కంటెంట్‌ను తొలగించాలా? ఈ చర్య రద్దు చేయలేరు.')">
+      <button type="submit" class="btn-danger">తొలగించు</button>
+    </form>
+  </div>
+
+  <div class="content-info">
+    <p><strong>శీర్షిక:</strong> {{ content.title_te }}</p>
+    {% if content.title_en %}<p><strong>Title:</strong> {{ content.title_en }}</p>{% endif %}
+    <p><strong>రకం:</strong> {{ content.type }}</p>
+    <p><strong>వినికిడులు:</strong> {{ content.play_count }}</p>
+    <p><strong>స్థితి:</strong> {{ 'ప్రచురితం ✅' if content.is_published else 'డ్రాఫ్ట్ ⏳' }}</p>
+  </div>
+
+  <h2>ఆడియో ఫైళ్ళు</h2>
+  <table class="admin-table">
+    <thead>
+      <tr><th>భాగం</th><th>శీర్షిక</th><th>వ్యవధి</th><th>పరిమాణం</th></tr>
+    </thead>
+    <tbody>
+      {% for af in audio_files %}
+      <tr>
+        <td>{{ af.part_number }}</td>
+        <td>{{ af.title_te or '—' }}</td>
+        <td>{% if af.duration_sec %}{{ af.duration_sec // 60 }}:{{ '%02d' % (af.duration_sec % 60) }}{% else %}—{% endif %}</td>
+        <td>{% if af.file_size_bytes %}{{ (af.file_size_bytes / 1024 / 1024) | round(1) }} MB{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="/admin/upload" class="btn-secondary">+ మరో భాగం అప్‌లోడ్ చేయండి</a>
+  <a href="/admin" class="btn-link">← వెనక్కి</a>
+</section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% set type_labels = {"music": "సంగీతం", "podcast": "పాడ్‌క్యాస్ట్", "audiobook": "ఆడియోబుక్", "story": "కథలు"} %}
+{% block title %}{{ type_labels[content_type] }} — తెలుగు వినండి{% endblock %}
+
+{% block content %}
+<section class="section">
+  <h1 class="section-title">{{ type_labels[content_type] }}</h1>
+
+  {% if items %}
+  <div class="content-grid">
+    {% for item in items %}
+    <a href="/content/{{ item.id }}" class="content-card">
+      <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+      <div class="card-info">
+        <div class="card-title">{{ item.title_te }}</div>
+        {% if item.artist_author %}<div class="card-subtitle">{{ item.artist_author }}</div>{% endif %}
+        <div class="card-meta">{{ item.play_count }} వినికిడులు</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-msg">ఇంకా కంటెంట్ లేదు. త్వరలో వస్తోంది!</p>
+  {% endif %}
+</section>
+{% endblock %}

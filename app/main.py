@@ -1,0 +1,33 @@
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from starlette.middleware.sessions import SessionMiddleware
+
+from app.config import APP_SECRET_KEY
+from app.routes import home, content, search, library, auth_routes, admin
+
+app = FastAPI(title="తెలుగు వినండి", docs_url=None, redoc_url=None)
+
+app.add_middleware(SessionMiddleware, secret_key=APP_SECRET_KEY, max_age=60 * 60 * 24 * 30)
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+app.include_router(auth_routes.router)
+app.include_router(home.router)
+app.include_router(content.router)
+app.include_router(search.router)
+app.include_router(library.router)
+app.include_router(admin.router)
+
+
+@app.exception_handler(401)
+async def unauthorized_handler(request: Request, exc):
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(f"/login?next={request.url.path}")
+
+
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    from fastapi.templating import Jinja2Templates
+    templates = Jinja2Templates(directory="app/templates")
+    return templates.TemplateResponse("404.html", {"request": request}, status_code=404)

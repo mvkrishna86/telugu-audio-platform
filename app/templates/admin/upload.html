@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}కంటెంట్ అప్‌లోడ్{% endblock %}
+
+{% block content %}
+<section class="section admin-section">
+  <h1>కొత్త కంటెంట్ అప్‌లోడ్</h1>
+
+  <form action="/admin/upload" method="post" enctype="multipart/form-data" class="upload-form">
+
+    <div class="form-group">
+      <label>శీర్షిక (తెలుగు) *</label>
+      <input type="text" name="title_te" required placeholder="తెలుగులో శీర్షిక" />
+    </div>
+
+    <div class="form-group">
+      <label>Title (English)</label>
+      <input type="text" name="title_en" placeholder="English title (optional)" />
+    </div>
+
+    <div class="form-group">
+      <label>రకం *</label>
+      <select name="content_type" required>
+        <option value="music">సంగీతం</option>
+        <option value="podcast">పాడ్‌క్యాస్ట్</option>
+        <option value="audiobook">ఆడియోబుక్</option>
+        <option value="story">కథ</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>వర్గం</label>
+      <select name="category_id">
+        <option value="">— వర్గం ఎంచుకోండి —</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name_te }} ({{ cat.name_en }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>కళాకారుడు / రచయిత</label>
+      <input type="text" name="artist_author" placeholder="పేరు" />
+    </div>
+
+    <div class="form-group">
+      <label>విడుదల సంవత్సరం</label>
+      <input type="number" name="release_year" placeholder="2024" min="1900" max="2099" />
+    </div>
+
+    <div class="form-group">
+      <label>వివరణ (తెలుగు)</label>
+      <textarea name="description_te" rows="3" placeholder="తెలుగులో వివరణ"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Description (English)</label>
+      <textarea name="description_en" rows="3" placeholder="English description (optional)"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>భాగ సంఖ్య (Chapter/Episode)</label>
+      <input type="number" name="part_number" value="1" min="1" />
+    </div>
+
+    <div class="form-group">
+      <label>భాగం శీర్షిక (తెలుగు)</label>
+      <input type="text" name="part_title_te" placeholder="అధ్యాయం లేదా ఎపిసోడ్ పేరు" />
+    </div>
+
+    <div class="form-group">
+      <label>థంబ్‌నెయిల్ చిత్రం</label>
+      <input type="file" name="thumbnail" accept="image/jpeg,image/png,image/webp" />
+    </div>
+
+    <div class="form-group">
+      <label>ఆడియో ఫైల్ * (MP3 / AAC, గరిష్టంగా 500 MB)</label>
+      <input type="file" name="audio_file" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+    </div>
+
+    <button type="submit" class="btn-primary">అప్‌లోడ్ చేయండి</button>
+    <a href="/admin" class="btn-link">రద్దు</a>
+  </form>
+</section>
+{% endblock %}

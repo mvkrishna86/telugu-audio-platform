@@ -1,0 +1,14 @@
+{
+  "name": "తెలుగు వినండి",
+  "short_name": "TeluguVinandi",
+  "description": "తెలుగు పాటలు, పాడ్‌క్యాస్టులు మరియు ఆడియోబుక్‌లు",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0520",
+  "theme_color": "#1a0a2e",
+  "lang": "te",
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="te">
+<head><meta charset="UTF-8" /><title>లాగిన్ అవుతోంది...</title></head>
+<body>
+<p>దయచేసి వేచి ఉండండి...</p>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async () => {
+  // Supabase puts the session in the URL fragment after OAuth redirect
+  const { createClient } = window.supabase;
+  const sb = createClient(
+    document.querySelector('meta[name=sb-url]')?.content || window.__SB_URL__,
+    document.querySelector('meta[name=sb-key]')?.content || window.__SB_KEY__
+  );
+  // getSession() reads from the fragment automatically
+  const { data } = await sb.auth.getSession();
+  if (!data.session) { window.location.href = '/login'; return; }
+  const user = data.session.user;
+  const meta = user.user_metadata || {};
+  await fetch('/auth/session', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      id: user.id,
+      name: meta.full_name || meta.name || '',
+      email: user.email || '',
+      avatar_url: meta.avatar_url || '',
+    }),
+  });
+  window.location.href = '/';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}లాగిన్ — తెలుగు వినండి{% endblock %}
+
+{% block head %}
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+{% endblock %}
+
+{% block content %}
+<section class="login-page">
+  <div class="login-box">
+    <h1>స్వాగతం 👋</h1>
+    <p>వినడం ప్రారంభించడానికి లాగిన్ అవ్వండి</p>
+
+    <div id="login-error" class="error-msg hidden"></div>
+
+    <!-- Google -->
+    <button class="btn-oauth btn-google" onclick="loginWithGoogle()">
+      <img src="/static/icons/google.svg" alt="" /> Google తో లాగిన్
+    </button>
+
+    <!-- Facebook -->
+    <button class="btn-oauth btn-facebook" onclick="loginWithFacebook()">
+      <img src="/static/icons/facebook.svg" alt="" /> Facebook తో లాగిన్
+    </button>
+
+    <div class="divider">లేదా</div>
+
+    <!-- Phone OTP -->
+    <div id="phone-section">
+      <input type="tel" id="phone-input" placeholder="+91 9XXXXXXXXX" />
+      <button class="btn-primary" onclick="sendOTP()">OTP పంపండి</button>
+    </div>
+
+    <div id="otp-section" class="hidden">
+      <input type="text" id="otp-input" placeholder="6-అంక OTP నమోదు చేయండి" maxlength="6" />
+      <button class="btn-primary" onclick="verifyOTP()">నిర్ధారించండి</button>
+      <button class="btn-link" onclick="showPhoneSection()">తిరిగి వెళ్ళు</button>
+    </div>
+
+    <div class="divider">లేదా</div>
+
+    <!-- Email / Password -->
+    <input type="email" id="email-input" placeholder="ఈమెయిల్" />
+    <input type="password" id="password-input" placeholder="పాస్‌వర్డ్" />
+    <button class="btn-primary" onclick="loginWithEmail()">లాగిన్</button>
+    <button class="btn-link" onclick="signupWithEmail()">కొత్త ఖాతా సృష్టించండి</button>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const supabase = window.supabase.createClient('{{ supabase_url }}', '{{ supabase_anon_key }}');
+
+async function finishLogin(session) {
+  const user = session.user;
+  const meta = user.user_metadata || {};
+  await fetch('/auth/session', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      id: user.id,
+      name: meta.full_name || meta.name || '',
+      email: user.email || '',
+      avatar_url: meta.avatar_url || '',
+    }),
+  });
+  const params = new URLSearchParams(window.location.search);
+  window.location.href = params.get('next') || '/';
+}
+
+async function loginWithGoogle() {
+  await supabase.auth.signInWithOAuth({provider: 'google', options: {redirectTo: '{{ app_base_url }}/auth/callback'}});
+}
+
+async function loginWithFacebook() {
+  await supabase.auth.signInWithOAuth({provider: 'facebook', options: {redirectTo: '{{ app_base_url }}/auth/callback'}});
+}
+
+async function sendOTP() {
+  const phone = document.getElementById('phone-input').value.trim();
+  const {error} = await supabase.auth.signInWithOtp({phone});
+  if (error) { showError(error.message); return; }
+  document.getElementById('phone-section').classList.add('hidden');
+  document.getElementById('otp-section').classList.remove('hidden');
+}
+
+async function verifyOTP() {
+  const phone = document.getElementById('phone-input').value.trim();
+  const token = document.getElementById('otp-input').value.trim();
+  const {data, error} = await supabase.auth.verifyOtp({phone, token, type: 'sms'});
+  if (error) { showError(error.message); return; }
+  await finishLogin(data.session);
+}
+
+async function loginWithEmail() {
+  const email = document.getElementById('email-input').value.trim();
+  const password = document.getElementById('password-input').value;
+  const {data, error} = await supabase.auth.signInWithPassword({email, password});
+  if (error) { showError(error.message); return; }
+  await finishLogin(data.session);
+}
+
+async function signupWithEmail() {
+  const email = document.getElementById('email-input').value.trim();
+  const password = document.getElementById('password-input').value;
+  const {data, error} = await supabase.auth.signUp({email, password});
+  if (error) { showError(error.message); return; }
+  if (data.session) { await finishLogin(data.session); } else {
+    showError('ధృవీకరణ ఈమెయిల్ పంపబడింది. దయచేసి మీ ఇన్‌బాక్స్ తనిఖీ చేయండి.');
+  }
+}
+
+function showPhoneSection() {
+  document.getElementById('otp-section').classList.add('hidden');
+  document.getElementById('phone-section').classList.remove('hidden');
+}
+
+function showError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+</script>
+{% endblock %}

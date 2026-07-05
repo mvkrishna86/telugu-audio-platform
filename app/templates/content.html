@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ content.title_te }} — తెలుగు వినండి{% endblock %}
+
+{% block content %}
+<section class="content-detail">
+  <div class="detail-header">
+    <img src="{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ content.title_te }}" class="detail-thumb" />
+    <div class="detail-meta">
+      <span class="badge">{{ content.type }}</span>
+      <h1>{{ content.title_te }}</h1>
+      {% if content.title_en %}<h2 class="subtitle">{{ content.title_en }}</h2>{% endif %}
+      {% if content.artist_author %}<p class="artist">{{ content.artist_author }}</p>{% endif %}
+      {% if content.description_te %}<p class="description">{{ content.description_te }}</p>{% endif %}
+      <p class="play-count">{{ content.play_count }} వినికిడులు</p>
+
+      {% if user %}
+        <button class="btn-bookmark" onclick="toggleBookmark('{{ content.id }}')" id="btn-bookmark">
+          ♡ బుక్‌మార్క్
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Episode / Part list -->
+  {% if audio_files %}
+  <div class="episode-list">
+    <h3>{% if audio_files|length > 1 %}భాగాలు{% else %}ఆడియో{% endif %}</h3>
+    {% for af in audio_files %}
+    <div class="episode-row" id="ep-{{ af.id }}">
+      <div class="ep-info">
+        <span class="ep-num">{{ af.part_number }}</span>
+        <span class="ep-title">{{ af.title_te or content.title_te }}</span>
+        {% if af.duration_sec %}
+        <span class="ep-duration">{{ (af.duration_sec // 60) }}:{{ '%02d' % (af.duration_sec % 60) }}</span>
+        {% endif %}
+      </div>
+      {% if user %}
+        <button class="btn-play" onclick="playAudio('{{ af.id }}', '{{ af.title_te or content.title_te }}', '{{ content.title_te }}', '{{ content.thumbnail_url }}')">▶ వినండి</button>
+      {% else %}
+        <a href="/login" class="btn-play">🔒 లాగిన్ అవ్వండి</a>
+      {% endif %}
+
+      {% if last_position and last_position.audio_file_id == af.id %}
+        <span class="resume-badge">▶ {{ (last_position.position_sec // 60) }}:{{ '%02d' % (last_position.position_sec % 60) }} నుండి కొనసాగించండి</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function toggleBookmark(contentId) {
+  const resp = await fetch(`/library/bookmark/${contentId}`, {method: 'POST'});
+  const data = await resp.json();
+  document.getElementById('btn-bookmark').textContent = data.bookmarked ? '♥ బుక్‌మార్క్ చేయబడింది' : '♡ బుక్‌మార్క్';
+}
+</script>
+{% endblock %}

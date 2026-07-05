@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}వెతకండి — తెలుగు వినండి{% endblock %}
+
+{% block content %}
+<section class="section">
+  <h1 class="section-title">🔍 వెతకండి</h1>
+
+  <form action="/search" method="get" class="search-form">
+    <input type="text" name="q" value="{{ query }}" placeholder="తెలుగు లేదా English లో వెతకండి..." autofocus />
+    <button type="submit">వెతకండి</button>
+  </form>
+
+  {% if query %}
+    {% if results %}
+      <p class="result-count">{{ results|length }} ఫలితాలు "{{ query }}" కోసం</p>
+      <div class="content-grid">
+        {% for item in results %}
+        <a href="/content/{{ item.id }}" class="content-card">
+          <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+          <div class="card-info">
+            <div class="card-title">{{ item.title_te }}</div>
+            {% if item.artist_author %}<div class="card-subtitle">{{ item.artist_author }}</div>{% endif %}
+            <div class="card-meta">{{ item.type }}</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-msg">"{{ query }}" కోసం ఏ ఫలితాలు కనుగొనబడలేదు.</p>
+    {% endif %}
+  {% endif %}
+</section>
+{% endblock %}

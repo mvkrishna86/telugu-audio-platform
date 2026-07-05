@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="section admin-section">
+  <h1>Admin Dashboard</h1>
+
+  <div class="stat-cards">
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.total_content }}</div>
+      <div class="stat-label">మొత్తం కంటెంట్</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.published }}</div>
+      <div class="stat-label">ప్రచురితమైనవి</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.total_users }}</div>
+      <div class="stat-label">వినికిడిదారులు</div>
+    </div>
+  </div>
+
+  <a href="/admin/upload" class="btn-primary">+ కొత్త కంటెంట్ అప్‌లోడ్ చేయండి</a>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>శీర్షిక</th>
+        <th>రకం</th>
+        <th>స్థితి</th>
+        <th>వినికిడులు</th>
+        <th>చర్యలు</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in recent_content %}
+      <tr>
+        <td>{{ item.title_te }}</td>
+        <td>{{ item.type }}</td>
+        <td>
+          <span class="badge {{ 'badge-green' if item.is_published else 'badge-gray' }}">
+            {{ 'ప్రచురితం' if item.is_published else 'డ్రాఫ్ట్' }}
+          </span>
+        </td>
+        <td>{{ item.play_count }}</td>
+        <td>
+          <a href="/admin/content/{{ item.id }}">సవరించు</a>
+          <form action="/admin/content/{{ item.id }}/publish" method="post" style="display:inline">
+            <button type="submit" class="btn-link">
+              {{ 'అన్‌పబ్లిష్' if item.is_published else 'ప్రచురించు' }}
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

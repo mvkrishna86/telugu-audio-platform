@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}తెలుగు వినండి — హోమ్{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+  <h1>తెలుగు కంటెంట్ వినండి</h1>
+  <p>పాటలు · పాడ్‌క్యాస్టులు · ఆడియోబుక్‌లు · కథలు — అన్నీ ఉచితంగా</p>
+  {% if not user %}
+    <a href="/login" class="btn-primary">ఇప్పుడే ప్రారంభించండి</a>
+  {% endif %}
+</section>
+
+<!-- Categories -->
+{% if categories %}
+<section class="section">
+  <h2 class="section-title">వర్గాలు</h2>
+  <div class="category-grid">
+    {% for cat in categories %}
+    <a href="/browse/{{ cat.slug }}" class="category-card">
+      {% if cat.icon_url %}<img src="{{ cat.icon_url }}" alt="" />{% endif %}
+      <span>{{ cat.name_te }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Featured / Trending -->
+{% if featured %}
+<section class="section">
+  <h2 class="section-title">ట్రెండింగ్ 🔥</h2>
+  <div class="content-grid">
+    {% for item in featured %}
+    <a href="/content/{{ item.id }}" class="content-card">
+      <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+      <div class="card-info">
+        <div class="card-title">{{ item.title_te }}</div>
+        {% if item.title_en %}<div class="card-subtitle">{{ item.title_en }}</div>{% endif %}
+        <div class="card-meta">{{ item.type }} · {{ item.play_count }} వినికిడులు</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Recently Added -->
+{% if recent %}
+<section class="section">
+  <h2 class="section-title">కొత్తగా జోడించబడింది</h2>
+  <div class="content-grid">
+    {% for item in recent %}
+    <a href="/content/{{ item.id }}" class="content-card">
+      <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+      <div class="card-info">
+        <div class="card-title">{{ item.title_te }}</div>
+        {% if item.title_en %}<div class="card-subtitle">{{ item.title_en }}</div>{% endif %}
+        <div class="card-meta">{{ item.type }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
