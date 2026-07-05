@@ -57,6 +57,9 @@ async def get_play_url(request: Request, audio_file_id: str):
     if not row:
         raise HTTPException(status_code=404, detail="Audio file not found")
 
+    from app.config import CLOUDFRONT_DOMAIN, CLOUDFRONT_PRIVATE_KEY_PATH
+    if not CLOUDFRONT_DOMAIN or not CLOUDFRONT_PRIVATE_KEY_PATH:
+        raise HTTPException(status_code=503, detail="Audio streaming not configured yet")
     signed_url = get_signed_url(row["s3_key"])
     return {"url": signed_url}
 

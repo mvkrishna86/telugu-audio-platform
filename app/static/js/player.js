@@ -7,6 +7,7 @@ async function playAudio(fileId, title, subtitle, thumbUrl) {
   // Fetch signed CloudFront URL from backend
   const resp = await fetch(`/api/play/${fileId}`, {method: 'POST'});
   if (resp.status === 401) { window.location.href = '/login'; return; }
+  if (resp.status === 503) { alert('ఆడియో స్ట్రీమింగ్ త్వరలో అందుబాటులో ఉంటుంది (AWS సెటప్ పెండింగ్)'); return; }
   if (!resp.ok) { alert('ఆడియో లోడ్ చేయడంలో వైఫల్యం'); return; }
   const { url } = await resp.json();
 
