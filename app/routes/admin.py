@@ -21,7 +21,7 @@ async def admin_dashboard(request: Request):
         "total_users":   (query_one("SELECT COUNT(*) as n FROM users") or {}).get("n", 0),
     }
     recent_content = query(
-        "SELECT id, title_te, title_en, type, is_published, play_count, created_at "
+        "SELECT id::text, title_te, title_en, type, is_published, play_count, created_at "
         "FROM content ORDER BY created_at DESC LIMIT 20"
     )
 
@@ -34,7 +34,7 @@ async def admin_dashboard(request: Request):
 @router.get("/upload", response_class=HTMLResponse)
 async def upload_page(request: Request):
     user = require_admin(request)
-    categories = query("SELECT id, name_te, name_en FROM categories ORDER BY display_order")
+    categories = query("SELECT id::text, name_te, name_en FROM categories ORDER BY display_order")
     return templates.TemplateResponse("admin/upload.html", {
         "request": request, "user": user, "categories": categories,
     })
@@ -81,8 +81,8 @@ async def upload_content(
         INSERT INTO content
           (title_te, title_en, description_te, description_en, type,
            category_id, artist_author, release_year, thumbnail_url, is_published, uploaded_by)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,FALSE,%s)
-        RETURNING id
+        VALUES (%s,%s,%s,%s,%s,%s::uuid,%s,%s,%s,FALSE,%s::uuid)
+        RETURNING id::text
         """,
         (
             title_te, title_en, description_te, description_en, content_type,
@@ -94,7 +94,7 @@ async def upload_content(
 
     execute(
         "INSERT INTO audio_files (content_id, part_number, title_te, title_en, s3_key, file_size_bytes) "
-        "VALUES (%s,%s,%s,%s,%s,%s)",
+        "VALUES (%s::uuid,%s,%s,%s,%s,%s)",
         (content_row["id"], part_number, part_title_te, part_title_en, audio_key, len(audio_bytes))
     )
 
@@ -105,16 +105,16 @@ async def upload_content(
 async def edit_content_page(request: Request, content_id: str):
     user = require_admin(request)
 
-    content = query_one("SELECT * FROM content WHERE id=%s", (content_id,))
+    content = query_one("SELECT *, id::text as id FROM content WHERE id=%s::uuid", (content_id,))
     if not content:
         raise HTTPException(status_code=404)
 
     audio_files = query(
-        "SELECT id, part_number, title_te, title_en, duration_sec, file_size_bytes "
-        "FROM audio_files WHERE content_id=%s ORDER BY part_number",
+        "SELECT id::text, part_number, title_te, title_en, duration_sec, file_size_bytes "
+        "FROM audio_files WHERE content_id=%s::uuid ORDER BY part_number",
         (content_id,)
     )
-    categories = query("SELECT id, name_te, name_en FROM categories ORDER BY display_order")
+    categories = query("SELECT id::text, name_te, name_en FROM categories ORDER BY display_order")
 
     return templates.TemplateResponse("admin/edit_content.html", {
         "request": request, "user": user,
@@ -125,10 +125,11 @@ async def edit_content_page(request: Request, content_id: str):
 @router.post("/content/{content_id}/publish")
 async def toggle_publish(request: Request, content_id: str):
     require_admin(request)
-    current = query_one("SELECT is_published FROM content WHERE id=%s", (content_id,))
+    current = query_one("SELECT is_published FROM content WHERE id=%s::uuid", (content_id,))
     if not current:
         raise HTTPException(status_code=404)
-    execute("UPDATE content SET is_published=%s WHERE id=%s", (not current["is_published"], content_id))
+    execute("UPDATE content SET is_published=%s WHERE id=%s::uuid",
+            (not current["is_published"], content_id))
     return RedirectResponse(f"/admin/content/{content_id}", status_code=303)
 
 
@@ -136,12 +137,12 @@ async def toggle_publish(request: Request, content_id: str):
 async def delete_content(request: Request, content_id: str):
     require_admin(request)
 
-    audio_files = query("SELECT s3_key FROM audio_files WHERE content_id=%s", (content_id,))
+    audio_files = query("SELECT s3_key FROM audio_files WHERE content_id=%s::uuid", (content_id,))
     for af in audio_files:
         try:
             delete_s3_object(af["s3_key"])
         except Exception:
             pass
 
-    execute("DELETE FROM content WHERE id=%s", (content_id,))
+    execute("DELETE FROM content WHERE id=%s::uuid", (content_id,))
     return RedirectResponse("/admin", status_code=303)

@@ -17,31 +17,30 @@ async def content_detail(request: Request, content_id: str):
     row = query_one(
         "SELECT c.*, cat.name_te as cat_name_te, cat.name_en as cat_name_en, cat.slug as cat_slug "
         "FROM content c LEFT JOIN categories cat ON cat.id=c.category_id "
-        "WHERE c.id=%s AND c.is_published=TRUE",
+        "WHERE c.id=%s::uuid AND c.is_published=TRUE",
         (content_id,)
     )
     if not row:
         raise HTTPException(status_code=404, detail="Content not found")
 
     audio_files = query(
-        "SELECT id, part_number, title_te, title_en, duration_sec FROM audio_files "
-        "WHERE content_id=%s ORDER BY part_number",
+        "SELECT id::text, part_number, title_te, title_en, duration_sec FROM audio_files "
+        "WHERE content_id=%s::uuid ORDER BY part_number",
         (content_id,)
     )
 
-    # Increment play count best-effort
     try:
-        execute("UPDATE content SET play_count=play_count+1 WHERE id=%s", (content_id,))
+        execute("UPDATE content SET play_count=play_count+1 WHERE id=%s::uuid", (content_id,))
     except Exception:
         pass
 
     last_position = None
     if user and audio_files:
-        af_ids = tuple(f["id"] for f in audio_files)
+        af_ids = [f["id"] for f in audio_files]
         last_position = query_one(
-            "SELECT audio_file_id, position_sec FROM listen_history "
-            "WHERE user_id=%s AND audio_file_id=ANY(%s) ORDER BY updated_at DESC LIMIT 1",
-            (user["id"], list(af_ids))
+            "SELECT audio_file_id::text, position_sec FROM listen_history "
+            "WHERE user_id=%s::uuid AND audio_file_id=ANY(%s::uuid[]) ORDER BY updated_at DESC LIMIT 1",
+            (user["id"], af_ids)
         )
 
     return templates.TemplateResponse("content.html", {
@@ -54,7 +53,7 @@ async def content_detail(request: Request, content_id: str):
 async def get_play_url(request: Request, audio_file_id: str):
     require_login(request)
 
-    row = query_one("SELECT s3_key FROM audio_files WHERE id=%s", (audio_file_id,))
+    row = query_one("SELECT s3_key FROM audio_files WHERE id=%s::uuid", (audio_file_id,))
     if not row:
         raise HTTPException(status_code=404, detail="Audio file not found")
 
@@ -75,7 +74,7 @@ async def save_position(request: Request):
     execute(
         """
         INSERT INTO listen_history (user_id, audio_file_id, position_sec, updated_at)
-        VALUES (%s, %s, %s, now())
+        VALUES (%s::uuid, %s::uuid, %s, now())
         ON CONFLICT (user_id, audio_file_id) DO UPDATE
           SET position_sec=EXCLUDED.position_sec, updated_at=now()
         """,

@@ -17,7 +17,7 @@ async def search(request: Request, q: str = ""):
     if q.strip():
         pattern = f"%{q.strip()}%"
         results = query(
-            "SELECT id, title_te, title_en, type, thumbnail_url, artist_author FROM content "
+            "SELECT id::text, title_te, title_en, type, thumbnail_url, artist_author FROM content "
             "WHERE is_published=TRUE AND ("
             "  title_te ILIKE %s OR "
             "  COALESCE(title_en,'') ILIKE %s OR "
