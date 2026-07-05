@@ -17,7 +17,7 @@
     return;
   }
 
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {auth: {detectSessionInUrl: true}});
 
   const { data } = await sb.auth.getSession();
   if (!data.session) {

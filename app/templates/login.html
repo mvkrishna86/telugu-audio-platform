@@ -50,8 +50,7 @@
 
 {% block scripts %}
 <script>
-const { createClient } = window.supabase;
-const supabase = createClient('{{ supabase_url }}', '{{ supabase_anon_key }}');
+const sbClient = window.supabase.createClient('{{ supabase_url }}', '{{ supabase_anon_key }}');
 
 async function finishLogin(session) {
   const user = session.user;
@@ -71,16 +70,16 @@ async function finishLogin(session) {
 }
 
 async function loginWithGoogle() {
-  await supabase.auth.signInWithOAuth({provider: 'google', options: {redirectTo: '{{ app_base_url }}/auth/callback'}});
+  await sbClient.auth.signInWithOAuth({provider: 'google', options: {redirectTo: '{{ app_base_url }}/auth/callback'}});
 }
 
 async function loginWithFacebook() {
-  await supabase.auth.signInWithOAuth({provider: 'facebook', options: {redirectTo: '{{ app_base_url }}/auth/callback'}});
+  await sbClient.auth.signInWithOAuth({provider: 'facebook', options: {redirectTo: '{{ app_base_url }}/auth/callback'}});
 }
 
 async function sendOTP() {
   const phone = document.getElementById('phone-input').value.trim();
-  const {error} = await supabase.auth.signInWithOtp({phone});
+  const {error} = await sbClient.auth.signInWithOtp({phone});
   if (error) { showError(error.message); return; }
   document.getElementById('phone-section').classList.add('hidden');
   document.getElementById('otp-section').classList.remove('hidden');
@@ -89,7 +88,7 @@ async function sendOTP() {
 async function verifyOTP() {
   const phone = document.getElementById('phone-input').value.trim();
   const token = document.getElementById('otp-input').value.trim();
-  const {data, error} = await supabase.auth.verifyOtp({phone, token, type: 'sms'});
+  const {data, error} = await sbClient.auth.verifyOtp({phone, token, type: 'sms'});
   if (error) { showError(error.message); return; }
   await finishLogin(data.session);
 }
@@ -97,7 +96,7 @@ async function verifyOTP() {
 async function loginWithEmail() {
   const email = document.getElementById('email-input').value.trim();
   const password = document.getElementById('password-input').value;
-  const {data, error} = await supabase.auth.signInWithPassword({email, password});
+  const {data, error} = await sbClient.auth.signInWithPassword({email, password});
   if (error) { showError(error.message); return; }
   await finishLogin(data.session);
 }
@@ -105,7 +104,7 @@ async function loginWithEmail() {
 async function signupWithEmail() {
   const email = document.getElementById('email-input').value.trim();
   const password = document.getElementById('password-input').value;
-  const {data, error} = await supabase.auth.signUp({email, password});
+  const {data, error} = await sbClient.auth.signUp({email, password});
   if (error) { showError(error.message); return; }
   if (data.session) { await finishLogin(data.session); } else {
     showError('ధృవీకరణ ఈమెయిల్ పంపబడింది. దయచేసి మీ ఇన్‌బాక్స్ తనిఖీ చేయండి.');
