@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
-from app.db import get_db
+from app.db import query, query_one, execute
 from app.auth import require_login
 
 router = APIRouter()
@@ -12,55 +12,43 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("/library", response_class=HTMLResponse)
 async def library(request: Request):
     user = require_login(request)
-    db = get_db()
 
-    bookmarks = (
-        db.table("bookmarks")
-        .select("content(id, title_te, title_en, type, thumbnail_url, artist_author)")
-        .eq("user_id", user["id"])
-        .order("created_at", desc=True)
-        .execute()
-        .data
+    bookmarks = query(
+        "SELECT c.id, c.title_te, c.title_en, c.type, c.thumbnail_url, c.artist_author "
+        "FROM bookmarks b JOIN content c ON c.id=b.content_id "
+        "WHERE b.user_id=%s ORDER BY b.created_at DESC",
+        (user["id"],)
     )
 
-    history = (
-        db.table("listen_history")
-        .select("position_sec, updated_at, audio_files(id, title_te, title_en, content_id, part_number, content(id, title_te, title_en, thumbnail_url))")
-        .eq("user_id", user["id"])
-        .order("updated_at", desc=True)
-        .limit(20)
-        .execute()
-        .data
+    history = query(
+        "SELECT lh.position_sec, lh.updated_at, "
+        "af.id as af_id, af.title_te as af_title_te, af.part_number, "
+        "c.id as c_id, c.title_te, c.thumbnail_url "
+        "FROM listen_history lh "
+        "JOIN audio_files af ON af.id=lh.audio_file_id "
+        "JOIN content c ON c.id=af.content_id "
+        "WHERE lh.user_id=%s ORDER BY lh.updated_at DESC LIMIT 20",
+        (user["id"],)
     )
 
-    return templates.TemplateResponse(
-        "library.html",
-        {
-            "request": request,
-            "user": user,
-            "bookmarks": bookmarks,
-            "history": history,
-        },
-    )
+    return templates.TemplateResponse("library.html", {
+        "request": request, "user": user,
+        "bookmarks": bookmarks, "history": history,
+    })
 
 
 @router.post("/library/bookmark/{content_id}", response_class=JSONResponse)
 async def toggle_bookmark(request: Request, content_id: str):
     user = require_login(request)
-    db = get_db()
 
-    existing = (
-        db.table("bookmarks")
-        .select("user_id")
-        .eq("user_id", user["id"])
-        .eq("content_id", content_id)
-        .execute()
-        .data
+    existing = query_one(
+        "SELECT 1 FROM bookmarks WHERE user_id=%s AND content_id=%s",
+        (user["id"], content_id)
     )
 
     if existing:
-        db.table("bookmarks").delete().eq("user_id", user["id"]).eq("content_id", content_id).execute()
+        execute("DELETE FROM bookmarks WHERE user_id=%s AND content_id=%s", (user["id"], content_id))
         return {"bookmarked": False}
     else:
-        db.table("bookmarks").insert({"user_id": user["id"], "content_id": content_id}).execute()
+        execute("INSERT INTO bookmarks (user_id, content_id) VALUES (%s, %s)", (user["id"], content_id))
         return {"bookmarked": True}

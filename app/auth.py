@@ -1,10 +1,9 @@
 from typing import Optional
 from fastapi import Request, HTTPException, status
-from app.db import get_db
+from app.db import query_one, execute
 
 
 def get_session_user(request: Request) -> Optional[dict]:
-    """Return the user dict stored in the session, or None if not logged in."""
     return request.session.get("user")
 
 
@@ -30,19 +29,16 @@ def require_superadmin(request: Request) -> dict:
 
 
 def sync_user_to_db(supabase_uid: str, name: str, email: str, avatar_url: str) -> dict:
-    """Upsert user into our users table and return the full user row."""
-    db = get_db()
-    result = (
-        db.table("users")
-        .upsert(
-            {
-                "supabase_uid": supabase_uid,
-                "name": name,
-                "email": email,
-                "avatar_url": avatar_url,
-            },
-            on_conflict="supabase_uid",
-        )
-        .execute()
+    row = execute(
+        """
+        INSERT INTO users (supabase_uid, name, email, avatar_url)
+        VALUES (%s, %s, %s, %s)
+        ON CONFLICT (supabase_uid) DO UPDATE
+          SET name = EXCLUDED.name,
+              email = EXCLUDED.email,
+              avatar_url = EXCLUDED.avatar_url
+        RETURNING *
+        """,
+        (supabase_uid, name, email, avatar_url),
     )
-    return result.data[0]
+    return row

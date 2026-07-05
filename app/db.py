@@ -1,14 +1,38 @@
+import psycopg2
+import psycopg2.extras
 from typing import Optional
-from supabase import create_client, Client
-from app.config import SUPABASE_URL, SUPABASE_SERVICE_KEY
+from app.config import DATABASE_URL
 
-# Service-role client — used only server-side, never exposed to browser
-_client: Optional[Client] = None
+_conn: Optional[psycopg2.extensions.connection] = None
 
 
-def get_db() -> Client:
-    global _client
-    if _client is None:
-        # supabase-py 2.x accepts both legacy JWT keys and new sb_secret_ format
-        _client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-    return _client
+def get_conn():
+    global _conn
+    if _conn is None or _conn.closed:
+        _conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+        _conn.autocommit = True
+    return _conn
+
+
+def query(sql: str, params=None) -> list:
+    """Run a SELECT and return list of dicts."""
+    with get_conn().cursor() as cur:
+        cur.execute(sql, params or ())
+        return [dict(r) for r in cur.fetchall()]
+
+
+def query_one(sql: str, params=None) -> Optional[dict]:
+    """Run a SELECT and return a single dict or None."""
+    rows = query(sql, params)
+    return rows[0] if rows else None
+
+
+def execute(sql: str, params=None) -> Optional[dict]:
+    """Run INSERT/UPDATE/DELETE with RETURNING, return first row or None."""
+    with get_conn().cursor() as cur:
+        cur.execute(sql, params or ())
+        try:
+            row = cur.fetchone()
+            return dict(row) if row else None
+        except psycopg2.ProgrammingError:
+            return None
