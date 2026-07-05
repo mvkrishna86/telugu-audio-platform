@@ -9,7 +9,7 @@ _conn: Optional[psycopg2.extensions.connection] = None
 def get_conn():
     global _conn
     if _conn is None or _conn.closed:
-        _conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+        _conn = psycopg2.connect(DATABASE_URL + "?sslmode=require", cursor_factory=psycopg2.extras.RealDictCursor)
         _conn.autocommit = True
     return _conn
 
