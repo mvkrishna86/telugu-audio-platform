@@ -1,8 +1,9 @@
+from typing import Optional
 from fastapi import Request, HTTPException, status
 from app.db import get_db
 
 
-def get_session_user(request: Request) -> dict | None:
+def get_session_user(request: Request) -> Optional[dict]:
     """Return the user dict stored in the session, or None if not logged in."""
     return request.session.get("user")
 
