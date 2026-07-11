@@ -3,8 +3,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 
+import base64, os
 from app.config import APP_SECRET_KEY
 from app.routes import home, content, search, library, auth_routes, admin
+
+# Write CloudFront private key from base64 env var if present
+_cf_key_b64 = os.environ.get("CLOUDFRONT_PRIVATE_KEY_B64", "")
+if _cf_key_b64:
+    with open("cloudfront_private_key.pem", "wb") as _f:
+        _f.write(base64.b64decode(_cf_key_b64))
 
 app = FastAPI(title="తెలుగు వినండి", docs_url=None, redoc_url=None)
 
