@@ -1,84 +1,147 @@
 {% extends "base.html" %}
-{% block title %}కంటెంట్ అప్‌లోడ్{% endblock %}
+{% block title %}New Content Upload{% endblock %}
 
 {% block content %}
 <section class="section admin-section">
-  <h1>కొత్త కంటెంట్ అప్‌లోడ్</h1>
+  <h1>Step 1 — Content Details</h1>
+  <p class="upload-hint">Fill in the details below, then upload all audio files on the next screen.</p>
 
   <form action="/admin/upload" method="post" enctype="multipart/form-data" class="upload-form">
 
-    <div class="form-group">
-      <label>శీర్షిక (తెలుగు) *</label>
-      <input type="text" name="title_te" required placeholder="తెలుగులో శీర్షిక" />
+    <div class="form-row">
+      <div class="form-group">
+        <label>శీర్షిక (తెలుగు) *</label>
+        <input type="text" name="title_te" required placeholder="తెలుగులో శీర్షిక" />
+      </div>
+      <div class="form-group">
+        <label>Title (English) *</label>
+        <input type="text" name="title_en" required placeholder="English title" />
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Title (English) *</label>
-      <input type="text" name="title_en" required placeholder="English title" />
+    <div class="form-row">
+      <div class="form-group">
+        <label>Type *</label>
+        <select name="content_type" required>
+          <option value="music">సంగీతం / Music</option>
+          <option value="podcast">పాడ్‌క్యాస్ట్ / Podcast</option>
+          <option value="audiobook">ఆడియోబుక్ / Audiobook</option>
+          <option value="story">కథ / Story</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category_id">
+          <option value="">— Select —</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}">{{ cat.name_te }} / {{ cat.name_en }}</option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>రకం *</label>
-      <select name="content_type" required>
-        <option value="music">సంగీతం</option>
-        <option value="podcast">పాడ్‌క్యాస్ట్</option>
-        <option value="audiobook">ఆడియోబుక్</option>
-        <option value="story">కథ</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>వర్గం</label>
-      <select name="category_id">
-        <option value="">— వర్గం ఎంచుకోండి —</option>
-        {% for cat in categories %}
-        <option value="{{ cat.id }}">{{ cat.name_te }} ({{ cat.name_en }})</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>కళాకారుడు / రచయిత</label>
-      <input type="text" name="artist_author" placeholder="పేరు" />
-    </div>
-
-    <div class="form-group">
-      <label>విడుదల సంవత్సరం</label>
-      <input type="number" name="release_year" placeholder="2024" min="1900" max="2099" />
+    <div class="form-row">
+      <div class="form-group">
+        <label>Artist / Author</label>
+        <input type="text" name="artist_author" placeholder="Name" />
+      </div>
+      <div class="form-group">
+        <label>Release Year</label>
+        <input type="number" name="release_year" placeholder="2024" min="1900" max="2099" />
+      </div>
     </div>
 
     <div class="form-group">
       <label>వివరణ (తెలుగు)</label>
-      <textarea name="description_te" rows="3" placeholder="తెలుగులో వివరణ"></textarea>
+      <textarea name="description_te" rows="2" placeholder="తెలుగులో వివరణ"></textarea>
     </div>
-
     <div class="form-group">
       <label>Description (English)</label>
-      <textarea name="description_en" rows="3" placeholder="English description (optional)"></textarea>
+      <textarea name="description_en" rows="2" placeholder="English description"></textarea>
     </div>
 
     <div class="form-group">
-      <label>భాగ సంఖ్య (Chapter/Episode)</label>
-      <input type="number" name="part_number" value="1" min="1" />
-    </div>
-
-    <div class="form-group">
-      <label>భాగం శీర్షిక (తెలుగు)</label>
-      <input type="text" name="part_title_te" placeholder="అధ్యాయం లేదా ఎపిసోడ్ పేరు" />
-    </div>
-
-    <div class="form-group">
-      <label>థంబ్‌నెయిల్ చిత్రం</label>
+      <label>Thumbnail Image</label>
       <input type="file" name="thumbnail" accept="image/jpeg,image/png,image/webp" />
     </div>
 
-    <div class="form-group">
-      <label>ఆడియో ఫైల్ * (MP3 / AAC, గరిష్టంగా 500 MB)</label>
-      <input type="file" name="audio_file" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+    <div class="form-divider">
+      <span>Step 2 — Upload Audio Files</span>
     </div>
 
-    <button type="submit" class="btn-primary">అప్‌లోడ్ చేయండి</button>
-    <a href="/admin" class="btn-link">రద్దు</a>
+    <div id="parts-container">
+      <div class="part-row" id="part-1">
+        <div class="part-header">
+          <span class="part-label">Part 1</span>
+          <button type="button" class="btn-remove-part" onclick="removePart(1)" style="display:none">✕ Remove</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Chapter/Part Title (Telugu)</label>
+            <input type="text" name="parts[0][title_te]" placeholder="e.g. అధ్యాయం 1" />
+          </div>
+          <div class="form-group">
+            <label>Chapter/Part Title (English)</label>
+            <input type="text" name="parts[0][title_en]" placeholder="e.g. Chapter 1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Audio File * (MP3/AAC, max 500 MB)</label>
+          <input type="file" name="parts[0][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-secondary" onclick="addPart()" id="btn-add-part">+ Add Another Part</button>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Upload All</button>
+      <a href="/admin" class="btn-link">Cancel</a>
+    </div>
   </form>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let partCount = 1;
+
+function addPart() {
+  const idx = partCount;
+  partCount++;
+  const container = document.getElementById('parts-container');
+  const div = document.createElement('div');
+  div.className = 'part-row';
+  div.id = `part-${idx + 1}`;
+  div.innerHTML = `
+    <div class="part-header">
+      <span class="part-label">Part ${idx + 1}</span>
+      <button type="button" class="btn-remove-part" onclick="removePart(${idx + 1})">✕ Remove</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Chapter/Part Title (Telugu)</label>
+        <input type="text" name="parts[${idx}][title_te]" placeholder="e.g. అధ్యాయం ${idx + 1}" />
+      </div>
+      <div class="form-group">
+        <label>Chapter/Part Title (English)</label>
+        <input type="text" name="parts[${idx}][title_en]" placeholder="e.g. Chapter ${idx + 1}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Audio File * (MP3/AAC, max 500 MB)</label>
+      <input type="file" name="parts[${idx}][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+    </div>`;
+  container.appendChild(div);
+  // Show remove button on first part if more than one
+  if (partCount > 1) document.querySelector('#part-1 .btn-remove-part').style.display = 'inline';
+}
+
+function removePart(num) {
+  const el = document.getElementById(`part-${num}`);
+  if (el) el.remove();
+  partCount--;
+  if (partCount <= 1) document.querySelector('#part-1 .btn-remove-part').style.display = 'none';
+}
+</script>
 {% endblock %}

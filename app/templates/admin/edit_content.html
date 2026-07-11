@@ -1,48 +1,121 @@
 {% extends "base.html" %}
-{% block title %}కంటెంట్ సవరించు{% endblock %}
+{% block title %}Edit Content{% endblock %}
 
 {% block content %}
 <section class="section admin-section">
-  <h1>కంటెంట్ సవరించు</h1>
+  <h1>{{ content.title_te }} {% if content.title_en %}/ {{ content.title_en }}{% endif %}</h1>
 
   <div class="edit-actions">
     <form action="/admin/content/{{ content.id }}/publish" method="post" style="display:inline">
       <button type="submit" class="btn-primary">
-        {{ 'అన్‌పబ్లిష్ చేయండి' if content.is_published else 'ప్రచురించండి' }}
+        {{ 'Unpublish' if content.is_published else 'Publish ✅' }}
       </button>
     </form>
     <form action="/admin/content/{{ content.id }}/delete" method="post" style="display:inline"
-          onsubmit="return confirm('ఈ కంటెంట్‌ను తొలగించాలా? ఈ చర్య రద్దు చేయలేరు.')">
-      <button type="submit" class="btn-danger">తొలగించు</button>
+          onsubmit="return confirm('Delete this content? This cannot be undone.')">
+      <button type="submit" class="btn-danger">Delete</button>
     </form>
+    <a href="/admin" class="btn-link">← Back</a>
   </div>
 
   <div class="content-info">
-    <p><strong>శీర్షిక:</strong> {{ content.title_te }}</p>
-    {% if content.title_en %}<p><strong>Title:</strong> {{ content.title_en }}</p>{% endif %}
-    <p><strong>రకం:</strong> {{ content.type }}</p>
-    <p><strong>వినికిడులు:</strong> {{ content.play_count }}</p>
-    <p><strong>స్థితి:</strong> {{ 'ప్రచురితం ✅' if content.is_published else 'డ్రాఫ్ట్ ⏳' }}</p>
+    <p><strong>Type:</strong> {{ content.type }} &nbsp;|&nbsp;
+       <strong>Plays:</strong> {{ content.play_count }} &nbsp;|&nbsp;
+       <strong>Status:</strong> {{ 'Published ✅' if content.is_published else 'Draft ⏳' }}
+    </p>
   </div>
 
-  <h2>ఆడియో ఫైళ్ళు</h2>
+  <!-- Existing parts -->
+  <h2>Audio Parts ({{ audio_files|length }})</h2>
   <table class="admin-table">
     <thead>
-      <tr><th>భాగం</th><th>శీర్షిక</th><th>వ్యవధి</th><th>పరిమాణం</th></tr>
+      <tr><th>#</th><th>Telugu Title</th><th>English Title</th><th>Duration</th><th>Size</th><th>Action</th></tr>
     </thead>
     <tbody>
       {% for af in audio_files %}
       <tr>
         <td>{{ af.part_number }}</td>
         <td>{{ af.title_te or '—' }}</td>
+        <td>{{ af.title_en or '—' }}</td>
         <td>{% if af.duration_sec %}{{ af.duration_sec // 60 }}:{{ '%02d' % (af.duration_sec % 60) }}{% else %}—{% endif %}</td>
         <td>{% if af.file_size_bytes %}{{ (af.file_size_bytes / 1024 / 1024) | round(1) }} MB{% else %}—{% endif %}</td>
+        <td>
+          <form action="/admin/audiofile/{{ af.id }}/delete" method="post" style="display:inline"
+                onsubmit="return confirm('Delete this part?')">
+            <button type="submit" class="btn-danger" style="padding:0.2rem 0.5rem;font-size:0.8rem">✕</button>
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 
-  <a href="/admin/upload" class="btn-secondary">+ మరో భాగం అప్‌లోడ్ చేయండి</a>
-  <a href="/admin" class="btn-link">← వెనక్కి</a>
+  <!-- Add more parts -->
+  <h2 style="margin-top:2rem">Add More Parts</h2>
+  <form action="/admin/content/{{ content.id }}/add-parts" method="post" enctype="multipart/form-data" class="upload-form">
+
+    <div id="new-parts-container">
+      <div class="part-row" id="new-part-1">
+        <div class="part-header">
+          <span class="part-label">New Part {{ audio_files|length + 1 }}</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title (Telugu)</label>
+            <input type="text" name="parts[0][title_te]" placeholder="e.g. అధ్యాయం {{ audio_files|length + 1 }}" />
+          </div>
+          <div class="form-group">
+            <label>Title (English)</label>
+            <input type="text" name="parts[0][title_en]" placeholder="e.g. Chapter {{ audio_files|length + 1 }}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Audio File * (MP3/AAC, max 500 MB)</label>
+          <input type="file" name="parts[0][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-secondary" onclick="addNewPart()">+ Add Another Part</button>
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Upload Parts</button>
+    </div>
+  </form>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let newPartCount = 1;
+const existingCount = {{ audio_files|length }};
+
+function addNewPart() {
+  const idx = newPartCount;
+  newPartCount++;
+  const container = document.getElementById('new-parts-container');
+  const div = document.createElement('div');
+  div.className = 'part-row';
+  const partNum = existingCount + idx + 1;
+  div.innerHTML = `
+    <div class="part-header">
+      <span class="part-label">New Part ${partNum}</span>
+      <button type="button" class="btn-remove-part" onclick="this.closest('.part-row').remove()">✕ Remove</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Title (Telugu)</label>
+        <input type="text" name="parts[${idx}][title_te]" placeholder="e.g. అధ్యాయం ${partNum}" />
+      </div>
+      <div class="form-group">
+        <label>Title (English)</label>
+        <input type="text" name="parts[${idx}][title_en]" placeholder="e.g. Chapter ${partNum}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Audio File * (MP3/AAC, max 500 MB)</label>
+      <input type="file" name="parts[${idx}][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+    </div>`;
+  container.appendChild(div);
+}
+</script>
 {% endblock %}
