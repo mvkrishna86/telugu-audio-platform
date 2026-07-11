@@ -52,6 +52,18 @@
 
 {% block scripts %}
 <script>
+// Full chapter list for auto-advance
+window.chapterList = [
+  {% for af in audio_files %}
+  {
+    id: "{{ af.id }}",
+    title: "{{ (af.title_te or content.title_te)|replace('"', '\\"') }}",
+    subtitle: "{{ content.title_te|replace('"', '\\"') }}",
+    thumb: "{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}"
+  }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+
 async function toggleBookmark(contentId) {
   const resp = await fetch(`/library/bookmark/${contentId}`, {method: 'POST'});
   const data = await resp.json();

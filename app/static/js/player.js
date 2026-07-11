@@ -4,7 +4,6 @@ let currentFileId = null;
 let saveTimer = null;
 
 async function playAudio(fileId, title, subtitle, thumbUrl) {
-  // Fetch signed CloudFront URL from backend
   const resp = await fetch(`/api/play/${fileId}`, {method: 'POST'});
   if (resp.status === 401) { window.location.href = '/login'; return; }
   if (resp.status === 503) { alert('ఆడియో స్ట్రీమింగ్ త్వరలో అందుబాటులో ఉంటుంది (AWS సెటప్ పెండింగ్)'); return; }
@@ -15,17 +14,32 @@ async function playAudio(fileId, title, subtitle, thumbUrl) {
   audio.src = url;
   audio.play();
 
-  // Update player UI
+  // Update mini-player UI
   document.getElementById('player-title').textContent = title;
   document.getElementById('player-subtitle').textContent = subtitle;
   document.getElementById('player-thumb').src = thumbUrl || '/static/icons/default-thumb.png';
   document.getElementById('btn-play-pause').textContent = '⏸';
   player.classList.remove('hidden');
 
+  // Highlight active chapter row, remove from others
+  document.querySelectorAll('.episode-row').forEach(row => row.classList.remove('ep-active'));
+  const activeRow = document.getElementById(`ep-${fileId}`);
+  if (activeRow) activeRow.classList.add('ep-active');
+
   // Restore saved position if any
   const saved = sessionStorage.getItem(`pos_${fileId}`);
   if (saved && parseFloat(saved) > 5) {
     audio.currentTime = parseFloat(saved);
+  }
+}
+
+function playNextChapter() {
+  const chapters = window.chapterList;
+  if (!chapters || !currentFileId) return;
+  const idx = chapters.findIndex(c => c.id === currentFileId);
+  if (idx !== -1 && idx < chapters.length - 1) {
+    const next = chapters[idx + 1];
+    playAudio(next.id, next.title, next.subtitle, next.thumb);
   }
 }
 
@@ -54,6 +68,7 @@ function setSpeed(value) {
 function closePlayer() {
   audio.pause();
   player.classList.add('hidden');
+  document.querySelectorAll('.episode-row').forEach(row => row.classList.remove('ep-active'));
   currentFileId = null;
 }
 
@@ -72,7 +87,6 @@ audio.addEventListener('timeupdate', () => {
   }
   cur.textContent = formatTime(audio.currentTime);
 
-  // Save position every 5 seconds
   if (currentFileId) {
     sessionStorage.setItem(`pos_${currentFileId}`, audio.currentTime);
     clearTimeout(saveTimer);
@@ -87,6 +101,8 @@ audio.addEventListener('loadedmetadata', () => {
 audio.addEventListener('ended', () => {
   document.getElementById('btn-play-pause').textContent = '▶';
   savePositionToServer();
+  // Auto-play next chapter after 1 second pause
+  setTimeout(playNextChapter, 1000);
 });
 
 audio.addEventListener('pause', () => {
@@ -109,14 +125,12 @@ async function savePositionToServer() {
       }),
     });
   } catch (_) {
-    // best-effort; ignore network failures
+    // best-effort
   }
 }
 
-// Save position when user navigates away
 window.addEventListener('beforeunload', savePositionToServer);
 
-// Register PWA service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/static/sw.js').catch(() => {});
 }

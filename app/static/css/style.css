@@ -97,6 +97,7 @@ button { cursor: pointer; font-family: var(--font); }
 .ep-duration { color: var(--text-muted); font-size: 0.85rem; }
 .btn-play { background: var(--accent); color: #000; border: none; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
 .resume-badge { font-size: 0.75rem; color: var(--accent2); }
+.ep-active { background: #2a1a4a; border-left: 3px solid var(--accent); }
 
 /* ── Search ── */
 .search-form { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
