@@ -13,6 +13,7 @@ templates = Jinja2Templates(directory="app/templates")
 async def login_page(request: Request):
     if request.session.get("user"):
         return RedirectResponse("/")
+    from app.lang import lang_context
     return templates.TemplateResponse(
         "login.html",
         {
@@ -20,6 +21,7 @@ async def login_page(request: Request):
             "supabase_url": SUPABASE_URL,
             "supabase_anon_key": SUPABASE_ANON_KEY,
             "app_base_url": APP_BASE_URL,
+            **lang_context(request),
         },
     )
 
@@ -54,3 +56,21 @@ async def create_session(request: Request):
 async def logout(request: Request):
     request.session.clear()
     return RedirectResponse("/")
+
+
+@router.get("/lang/{code}")
+async def set_language(request: Request, code: str):
+    """Toggle UI language and redirect back."""
+    if code in ("te", "en"):
+        request.session["lang"] = code
+        # Persist to DB if logged in
+        from app.db import execute
+        user = request.session.get("user")
+        if user:
+            execute(
+                "UPDATE users SET preferred_lang=%s WHERE id=%s::uuid",
+                (code, user["id"])
+            )
+            request.session["user"] = {**user, "preferred_lang": code}
+    referer = request.headers.get("referer", "/")
+    return RedirectResponse(referer)

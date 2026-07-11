@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.db import query, query_one, execute
 from app.auth import require_login
+from app.lang import lang_context
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -34,6 +35,7 @@ async def library(request: Request):
     return templates.TemplateResponse("library.html", {
         "request": request, "user": user,
         "bookmarks": bookmarks, "history": history,
+        **lang_context(request),
     })
 
 

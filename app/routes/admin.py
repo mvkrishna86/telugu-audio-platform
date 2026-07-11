@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.db import query, query_one, execute
 from app.auth import require_admin
+from app.lang import lang_context
 from app.storage import upload_file_to_s3, delete_s3_object
 from app.config import MAX_UPLOAD_BYTES, ALLOWED_AUDIO_TYPES, ALLOWED_IMAGE_TYPES
 
@@ -28,6 +29,7 @@ async def admin_dashboard(request: Request):
     return templates.TemplateResponse("admin/dashboard.html", {
         "request": request, "user": user,
         "stats": stats, "recent_content": recent_content,
+        **lang_context(request),
     })
 
 
@@ -37,6 +39,7 @@ async def upload_page(request: Request):
     categories = query("SELECT id::text, name_te, name_en FROM categories ORDER BY display_order")
     return templates.TemplateResponse("admin/upload.html", {
         "request": request, "user": user, "categories": categories,
+        **lang_context(request),
     })
 
 
@@ -44,7 +47,7 @@ async def upload_page(request: Request):
 async def upload_content(
     request: Request,
     title_te: str = Form(...),
-    title_en: str = Form(""),
+    title_en: str = Form(...),
     description_te: str = Form(""),
     description_en: str = Form(""),
     content_type: str = Form(...),

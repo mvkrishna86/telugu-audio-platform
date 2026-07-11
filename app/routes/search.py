@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.db import query
 from app.auth import get_session_user
+from app.lang import lang_context
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -28,4 +29,5 @@ async def search(request: Request, q: str = ""):
 
     return templates.TemplateResponse("search.html", {
         "request": request, "user": user, "query": q, "results": results,
+        **lang_context(request),
     })

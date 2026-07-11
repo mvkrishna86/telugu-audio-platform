@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ content.title_te }} — తెలుగు వినండి{% endblock %}
+{% block title %}{% if lang == 'en' and content.title_en %}{{ content.title_en }}{% else %}{{ content.title_te }}{% endif %} — {% if lang == 'en' %}Telugu Vinandi{% else %}తెలుగు వినండి{% endif %}{% endblock %}
 
 {% block content %}
 <section class="content-detail">
@@ -7,41 +7,54 @@
     <img src="{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ content.title_te }}" class="detail-thumb" />
     <div class="detail-meta">
       <span class="badge">{{ content.type }}</span>
-      <h1>{{ content.title_te }}</h1>
-      {% if content.title_en %}<h2 class="subtitle">{{ content.title_en }}</h2>{% endif %}
+      <h1>{% if lang == 'en' and content.title_en %}{{ content.title_en }}{% else %}{{ content.title_te }}{% endif %}</h1>
+      {% if content.title_en and content.title_te %}
+        <h2 class="subtitle">{% if lang == 'en' %}{{ content.title_te }}{% else %}{{ content.title_en }}{% endif %}</h2>
+      {% endif %}
       {% if content.artist_author %}<p class="artist">{{ content.artist_author }}</p>{% endif %}
-      {% if content.description_te %}<p class="description">{{ content.description_te }}</p>{% endif %}
-      <p class="play-count">{{ content.play_count }} వినికిడులు</p>
-
+      {% if lang == 'en' and content.description_en %}
+        <p class="description">{{ content.description_en }}</p>
+      {% elif content.description_te %}
+        <p class="description">{{ content.description_te }}</p>
+      {% endif %}
+      <p class="play-count">{{ content.play_count }} {% if lang == 'en' %}plays{% else %}వినికిడులు{% endif %}</p>
       {% if user %}
         <button class="btn-bookmark" onclick="toggleBookmark('{{ content.id }}')" id="btn-bookmark">
-          ♡ బుక్‌మార్క్
+          ♡ {% if lang == 'en' %}Bookmark{% else %}బుక్‌మార్క్{% endif %}
         </button>
       {% endif %}
     </div>
   </div>
 
-  <!-- Episode / Part list -->
   {% if audio_files %}
   <div class="episode-list">
-    <h3>{% if audio_files|length > 1 %}భాగాలు{% else %}ఆడియో{% endif %}</h3>
+    <h3>{% if audio_files|length > 1 %}{% if lang == 'en' %}Chapters{% else %}భాగాలు{% endif %}{% else %}{% if lang == 'en' %}Audio{% else %}ఆడియో{% endif %}{% endif %}</h3>
     {% for af in audio_files %}
     <div class="episode-row" id="ep-{{ af.id }}">
       <div class="ep-info">
         <span class="ep-num">{{ af.part_number }}</span>
-        <span class="ep-title">{{ af.title_te or content.title_te }}</span>
+        <span class="ep-title">
+          {% if lang == 'en' and af.title_en %}{{ af.title_en }}
+          {% elif af.title_te %}{{ af.title_te }}
+          {% elif lang == 'en' and content.title_en %}{{ content.title_en }}
+          {% else %}{{ content.title_te }}{% endif %}
+        </span>
         {% if af.duration_sec %}
         <span class="ep-duration">{{ (af.duration_sec // 60) }}:{{ '%02d' % (af.duration_sec % 60) }}</span>
         {% endif %}
       </div>
       {% if user %}
-        <button class="btn-play" onclick="playAudio('{{ af.id }}', '{{ af.title_te or content.title_te }}', '{{ content.title_te }}', '{{ content.thumbnail_url }}')">▶ వినండి</button>
+        <button class="btn-play" onclick="playAudio('{{ af.id }}',
+          '{% if lang == 'en' and af.title_en %}{{ af.title_en|replace("'","\\'") }}{% elif af.title_te %}{{ af.title_te|replace("'","\\'") }}{% else %}{{ content.title_te|replace("'","\\'") }}{% endif %}',
+          '{% if lang == 'en' and content.title_en %}{{ content.title_en|replace("'","\\'") }}{% else %}{{ content.title_te|replace("'","\\'") }}{% endif %}',
+          '{{ content.thumbnail_url }}')">
+          ▶ {% if lang == 'en' %}Play{% else %}వినండి{% endif %}
+        </button>
       {% else %}
-        <a href="/login" class="btn-play">🔒 లాగిన్ అవ్వండి</a>
+        <a href="/login" class="btn-play">🔒 {% if lang == 'en' %}Login to play{% else %}లాగిన్ అవ్వండి{% endif %}</a>
       {% endif %}
-
       {% if last_position and last_position.audio_file_id == af.id %}
-        <span class="resume-badge">▶ {{ (last_position.position_sec // 60) }}:{{ '%02d' % (last_position.position_sec % 60) }} నుండి కొనసాగించండి</span>
+        <span class="resume-badge">▶ {{ (last_position.position_sec // 60) }}:{{ '%02d' % (last_position.position_sec % 60) }} {% if lang == 'en' %}resume{% else %}నుండి కొనసాగించండి{% endif %}</span>
       {% endif %}
     </div>
     {% endfor %}
@@ -52,13 +65,12 @@
 
 {% block scripts %}
 <script>
-// Full chapter list for auto-advance
 window.chapterList = [
   {% for af in audio_files %}
   {
     id: "{{ af.id }}",
-    title: "{{ (af.title_te or content.title_te)|replace('"', '\\"') }}",
-    subtitle: "{{ content.title_te|replace('"', '\\"') }}",
+    title: "{% if lang == 'en' and af.title_en %}{{ af.title_en|replace('"','\\"') }}{% elif af.title_te %}{{ af.title_te|replace('"','\\"') }}{% else %}{{ content.title_te|replace('"','\\"') }}{% endif %}",
+    subtitle: "{% if lang == 'en' and content.title_en %}{{ content.title_en|replace('"','\\"') }}{% else %}{{ content.title_te|replace('"','\\"') }}{% endif %}",
     thumb: "{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}"
   }{% if not loop.last %},{% endif %}
   {% endfor %}
@@ -67,7 +79,10 @@ window.chapterList = [
 async function toggleBookmark(contentId) {
   const resp = await fetch(`/library/bookmark/${contentId}`, {method: 'POST'});
   const data = await resp.json();
-  document.getElementById('btn-bookmark').textContent = data.bookmarked ? '♥ బుక్‌మార్క్ చేయబడింది' : '♡ బుక్‌మార్క్';
+  const label = data.bookmarked
+    ? ('{{ lang }}' === 'en' ? '♥ Bookmarked' : '♥ బుక్‌మార్క్ చేయబడింది')
+    : ('{{ lang }}' === 'en' ? '♡ Bookmark'   : '♡ బుక్‌మార్క్');
+  document.getElementById('btn-bookmark').textContent = label;
 }
 </script>
 {% endblock %}

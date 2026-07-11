@@ -1,58 +1,55 @@
 <!DOCTYPE html>
-<html lang="te">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}తెలుగు వినండి{% endblock %}</title>
-  <meta name="description" content="{% block description %}తెలుగు పాటలు, పాడ్‌క్యాస్టులు మరియు ఆడియోబుక్‌లు వినండి{% endblock %}" />
+  <title>{% block title %}{% if lang == 'en' %}Telugu Vinandi{% else %}తెలుగు వినండి{% endif %}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{% if lang == 'en' %}Listen to Telugu songs, podcasts and audiobooks{% else %}తెలుగు పాటలు, పాడ్‌క్యాస్టులు మరియు ఆడియోబుక్‌లు వినండి{% endif %}{% endblock %}" />
 
-  <!-- Telugu font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
-
-  <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
-
   <link rel="stylesheet" href="/static/css/style.css" />
   <link rel="manifest" href="/static/manifest.json" />
   <meta name="theme-color" content="#1a0a2e" />
-
   {% block head %}{% endblock %}
 </head>
 <body>
 
-<!-- ── Navigation ── -->
 <nav class="navbar">
-  <a href="/" class="nav-brand">🎵 తెలుగు వినండి</a>
+  <a href="/" class="nav-brand">🎵 {% if lang == 'en' %}Telugu Vinandi{% else %}తెలుగు వినండి{% endif %}</a>
 
   <div class="nav-links">
-    <a href="/browse/music">సంగీతం</a>
-    <a href="/browse/podcast">పాడ్‌క్యాస్ట్</a>
-    <a href="/browse/audiobook">ఆడియోబుక్</a>
-    <a href="/browse/story">కథలు</a>
+    <a href="/browse/music">{% if lang == 'en' %}Music{% else %}సంగీతం{% endif %}</a>
+    <a href="/browse/podcast">{% if lang == 'en' %}Podcast{% else %}పాడ్‌క్యాస్ట్{% endif %}</a>
+    <a href="/browse/audiobook">{% if lang == 'en' %}Audiobook{% else %}ఆడియోబుక్{% endif %}</a>
+    <a href="/browse/story">{% if lang == 'en' %}Stories{% else %}కథలు{% endif %}</a>
     <a href="/search">🔍</a>
   </div>
 
   <div class="nav-user">
+    <!-- Language toggle -->
+    <a href="/lang/{% if lang == 'en' %}te{% else %}en{% endif %}" class="btn-lang" title="Switch language">
+      {% if lang == 'en' %}తె{% else %}EN{% endif %}
+    </a>
+
     {% if user %}
-      <a href="/library">📚 నా లైబ్రరీ</a>
+      <a href="/library">📚 {% if lang == 'en' %}My Library{% else %}నా లైబ్రరీ{% endif %}</a>
       {% if user.role in ('admin', 'superadmin') %}
         <a href="/admin" class="btn-admin">Admin</a>
       {% endif %}
-      <a href="/logout" class="btn-logout">లాగ్అవుట్</a>
+      <a href="/logout" class="btn-logout">{% if lang == 'en' %}Logout{% else %}లాగ్అవుట్{% endif %}</a>
     {% else %}
-      <a href="/login" class="btn-login">లాగిన్</a>
+      <a href="/login" class="btn-login">{% if lang == 'en' %}Login{% else %}లాగిన్{% endif %}</a>
     {% endif %}
   </div>
 </nav>
 
-<!-- ── Page content ── -->
 <main class="main-content">
   {% block content %}{% endblock %}
 </main>
 
-<!-- ── Persistent mini-player ── -->
 <div id="mini-player" class="mini-player hidden">
   <div class="player-info">
     <img id="player-thumb" src="" alt="" />
@@ -86,7 +83,7 @@
 <audio id="audio-engine" preload="none"></audio>
 
 <footer class="footer">
-  <p>© 2025 తెలుగు వినండి &nbsp;|&nbsp; <a href="/privacy">గోప్యతా విధానం</a> &nbsp;|&nbsp; <a href="/terms">నిబంధనలు</a></p>
+  <p>© 2025 తెలుగు వినండి &nbsp;|&nbsp; <a href="/privacy">{% if lang == 'en' %}Privacy Policy{% else %}గోప్యతా విధానం{% endif %}</a> &nbsp;|&nbsp; <a href="/terms">{% if lang == 'en' %}Terms{% else %}నిబంధనలు{% endif %}</a></p>
 </footer>
 
 <script src="/static/js/player.js"></script>

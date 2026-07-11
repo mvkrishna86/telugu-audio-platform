@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.db import query
 from app.auth import get_session_user
+from app.lang import lang_context
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -28,6 +29,7 @@ async def home(request: Request):
     return templates.TemplateResponse("home.html", {
         "request": request, "user": user,
         "featured": featured, "recent": recent, "categories": categories,
+        **lang_context(request),
     })
 
 
@@ -48,4 +50,5 @@ async def browse(request: Request, content_type: str):
     return templates.TemplateResponse("browse.html", {
         "request": request, "user": user,
         "items": items, "content_type": content_type,
+        **lang_context(request),
     })

@@ -1,44 +1,39 @@
 {% extends "base.html" %}
-
-{% block title %}తెలుగు వినండి — హోమ్{% endblock %}
+{% block title %}{% if lang == 'en' %}Telugu Vinandi — Home{% else %}తెలుగు వినండి — హోమ్{% endif %}{% endblock %}
 
 {% block content %}
-<!-- Hero -->
 <section class="hero">
-  <h1>తెలుగు కంటెంట్ వినండి</h1>
-  <p>పాటలు · పాడ్‌క్యాస్టులు · ఆడియోబుక్‌లు · కథలు — అన్నీ ఉచితంగా</p>
+  <h1>{% if lang == 'en' %}Listen to Telugu Content{% else %}తెలుగు కంటెంట్ వినండి{% endif %}</h1>
+  <p>{% if lang == 'en' %}Songs · Podcasts · Audiobooks · Stories — all free{% else %}పాటలు · పాడ్‌క్యాస్టులు · ఆడియోబుక్‌లు · కథలు — అన్నీ ఉచితంగా{% endif %}</p>
   {% if not user %}
-    <a href="/login" class="btn-primary">ఇప్పుడే ప్రారంభించండి</a>
+    <a href="/login" class="btn-primary">{% if lang == 'en' %}Get Started{% else %}ఇప్పుడే ప్రారంభించండి{% endif %}</a>
   {% endif %}
 </section>
 
-<!-- Categories -->
 {% if categories %}
 <section class="section">
-  <h2 class="section-title">వర్గాలు</h2>
+  <h2 class="section-title">{% if lang == 'en' %}Categories{% else %}వర్గాలు{% endif %}</h2>
   <div class="category-grid">
     {% for cat in categories %}
     <a href="/browse/{{ cat.slug }}" class="category-card">
       {% if cat.icon_url %}<img src="{{ cat.icon_url }}" alt="" />{% endif %}
-      <span>{{ cat.name_te }}</span>
+      <span>{% if lang == 'en' %}{{ cat.name_en }}{% else %}{{ cat.name_te }}{% endif %}</span>
     </a>
     {% endfor %}
   </div>
 </section>
 {% endif %}
 
-<!-- Featured / Trending -->
 {% if featured %}
 <section class="section">
-  <h2 class="section-title">ట్రెండింగ్ 🔥</h2>
+  <h2 class="section-title">{% if lang == 'en' %}Trending 🔥{% else %}ట్రెండింగ్ 🔥{% endif %}</h2>
   <div class="content-grid">
     {% for item in featured %}
     <a href="/content/{{ item.id }}" class="content-card">
       <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
       <div class="card-info">
-        <div class="card-title">{{ item.title_te }}</div>
-        {% if item.title_en %}<div class="card-subtitle">{{ item.title_en }}</div>{% endif %}
-        <div class="card-meta">{{ item.type }} · {{ item.play_count }} వినికిడులు</div>
+        <div class="card-title">{% if lang == 'en' and item.title_en %}{{ item.title_en }}{% else %}{{ item.title_te }}{% endif %}</div>
+        <div class="card-meta">{{ item.type }} · {{ item.play_count }} {% if lang == 'en' %}plays{% else %}వినికిడులు{% endif %}</div>
       </div>
     </a>
     {% endfor %}
@@ -46,17 +41,15 @@
 </section>
 {% endif %}
 
-<!-- Recently Added -->
 {% if recent %}
 <section class="section">
-  <h2 class="section-title">కొత్తగా జోడించబడింది</h2>
+  <h2 class="section-title">{% if lang == 'en' %}Recently Added{% else %}కొత్తగా జోడించబడింది{% endif %}</h2>
   <div class="content-grid">
     {% for item in recent %}
     <a href="/content/{{ item.id }}" class="content-card">
       <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
       <div class="card-info">
-        <div class="card-title">{{ item.title_te }}</div>
-        {% if item.title_en %}<div class="card-subtitle">{{ item.title_en }}</div>{% endif %}
+        <div class="card-title">{% if lang == 'en' and item.title_en %}{{ item.title_en }}{% else %}{{ item.title_te }}{% endif %}</div>
         <div class="card-meta">{{ item.type }}</div>
       </div>
     </a>

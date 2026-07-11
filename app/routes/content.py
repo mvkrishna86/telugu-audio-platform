@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from app.db import query, query_one, execute
 from app.auth import get_session_user, require_login
 from app.storage import get_signed_url
+from app.lang import lang_context
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -46,6 +47,7 @@ async def content_detail(request: Request, content_id: str):
     return templates.TemplateResponse("content.html", {
         "request": request, "user": user,
         "content": row, "audio_files": audio_files, "last_position": last_position,
+        **lang_context(request),
     })
 
 
