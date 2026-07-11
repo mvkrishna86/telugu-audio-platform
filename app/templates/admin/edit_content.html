@@ -27,7 +27,7 @@
 
   <!-- Existing parts -->
   <h2>Audio Parts ({{ audio_files|length }})</h2>
-  <table class="admin-table">
+  <div class="table-scroll"><table class="admin-table">
     <thead>
       <tr><th>#</th><th>Telugu Title</th><th>English Title</th><th>Duration</th><th>Size</th><th>Action</th></tr>
     </thead>
@@ -48,7 +48,7 @@
       </tr>
       {% endfor %}
     </tbody>
-  </table>
+  </table></div>
 
   <!-- Add more parts -->
   <h2 style="margin-top:2rem">Add More Parts</h2>
