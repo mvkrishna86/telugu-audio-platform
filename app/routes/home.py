@@ -14,13 +14,27 @@ templates = Jinja2Templates(directory="app/templates")
 async def home(request: Request):
     user = get_session_user(request)
 
+    # Respect user's preferred content types for homepage
+    preferred_types = []
+    if user and user.get("preferred_types"):
+        raw = user["preferred_types"]
+        if isinstance(raw, str) and raw not in ("None", "", "{}"):
+            preferred_types = [t.strip('{"} ') for t in raw.split(",") if t.strip('{"} ')]
+        elif isinstance(raw, list):
+            preferred_types = raw
+
+    type_filter = "AND type=ANY(%s)" if preferred_types else ""
+    type_params = [preferred_types] if preferred_types else []
+
     featured = query(
-        "SELECT id::text, title_te, title_en, type, thumbnail_url, play_count FROM content "
-        "WHERE is_published=TRUE ORDER BY play_count DESC LIMIT 6"
+        f"SELECT id::text, title_te, title_en, type, thumbnail_url, play_count FROM content "
+        f"WHERE is_published=TRUE {type_filter} ORDER BY play_count DESC LIMIT 6",
+        type_params
     )
     recent = query(
-        "SELECT id::text, title_te, title_en, type, thumbnail_url, created_at FROM content "
-        "WHERE is_published=TRUE ORDER BY created_at DESC LIMIT 12"
+        f"SELECT id::text, title_te, title_en, type, thumbnail_url, created_at FROM content "
+        f"WHERE is_published=TRUE {type_filter} ORDER BY created_at DESC LIMIT 12",
+        type_params
     )
     categories = query(
         "SELECT id::text, name_te, name_en, slug, icon_url FROM categories ORDER BY display_order"

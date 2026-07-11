@@ -36,6 +36,7 @@
 
     {% if user %}
       <a href="/library">📚 {% if lang == 'en' %}My Library{% else %}నా లైబ్రరీ{% endif %}</a>
+      <a href="/preferences">⚙️</a>
       {% if user.role in ('admin', 'superadmin') %}
         <a href="/admin" class="btn-admin">Admin</a>
       {% endif %}

@@ -4,13 +4,102 @@
 {% block content %}
 <section class="section">
   <h1 class="section-title">🔍 {% if lang == 'en' %}Search{% else %}వెతకండి{% endif %}</h1>
-  <form action="/search" method="get" class="search-form">
-    <input type="text" name="q" value="{{ query }}" placeholder="{% if lang == 'en' %}Search in Telugu or English...{% else %}తెలుగు లేదా English లో వెతకండి...{% endif %}" autofocus />
-    <button type="submit">{% if lang == 'en' %}Search{% else %}వెతకండి{% endif %}</button>
+
+  <form action="/search" method="get" class="search-form-full">
+    <!-- Main search box -->
+    <div class="search-main-row">
+      <input type="text" name="q" value="{{ query }}"
+        placeholder="{% if lang == 'en' %}Search in Telugu or English...{% else %}తెలుగు లేదా English లో వెతకండి...{% endif %}"
+        autofocus />
+      <button type="submit" class="btn-primary">{% if lang == 'en' %}Search{% else %}వెతకండి{% endif %}</button>
+    </div>
+
+    <!-- Filters -->
+    <details class="filter-panel" {% if author or tag or year_from or year_to or content_type %}open{% endif %}>
+      <summary>{% if lang == 'en' %}Filters & Sort{% else %}వడపోతలు & క్రమబద్ధీకరణ{% endif %}</summary>
+      <div class="filter-grid">
+
+        <!-- Author -->
+        <div class="form-group">
+          <label>{% if lang == 'en' %}Author / Artist{% else %}రచయిత / కళాకారుడు{% endif %}</label>
+          {% if all_authors %}
+          <select name="author">
+            <option value="">— {% if lang == 'en' %}All{% else %}అందరూ{% endif %} —</option>
+            {% for a in all_authors %}
+            <option value="{{ a }}" {% if author == a %}selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input type="text" name="author" value="{{ author }}" placeholder="{% if lang == 'en' %}Any artist/author{% else %}ఏదైనా{% endif %}" />
+          {% endif %}
+        </div>
+
+        <!-- Tag -->
+        <div class="form-group">
+          <label>{% if lang == 'en' %}Tag{% else %}ట్యాగ్{% endif %}</label>
+          {% if all_tags %}
+          <select name="tag">
+            <option value="">— {% if lang == 'en' %}All tags{% else %}అన్ని ట్యాగులు{% endif %} —</option>
+            {% for t in all_tags %}
+            <option value="{{ t }}" {% if tag == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input type="text" name="tag" value="{{ tag }}" placeholder="e.g. devotional" />
+          {% endif %}
+        </div>
+
+        <!-- Type -->
+        <div class="form-group">
+          <label>{% if lang == 'en' %}Type{% else %}రకం{% endif %}</label>
+          <select name="content_type">
+            <option value="">— {% if lang == 'en' %}All types{% else %}అన్ని రకాలు{% endif %} —</option>
+            <option value="music"     {% if content_type == 'music' %}selected{% endif %}>{% if lang == 'en' %}Music{% else %}సంగీతం{% endif %}</option>
+            <option value="podcast"   {% if content_type == 'podcast' %}selected{% endif %}>Podcast</option>
+            <option value="audiobook" {% if content_type == 'audiobook' %}selected{% endif %}>Audiobook</option>
+            <option value="story"     {% if content_type == 'story' %}selected{% endif %}>{% if lang == 'en' %}Story{% else %}కథ{% endif %}</option>
+          </select>
+        </div>
+
+        <!-- Year range -->
+        <div class="form-group">
+          <label>{% if lang == 'en' %}Year From{% else %}సంవత్సరం నుండి{% endif %}</label>
+          <input type="number" name="year_from" value="{{ year_from }}" placeholder="1990" min="1900" max="2099" />
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'en' %}Year To{% else %}సంవత్సరం వరకు{% endif %}</label>
+          <input type="number" name="year_to" value="{{ year_to }}" placeholder="2025" min="1900" max="2099" />
+        </div>
+
+        <!-- Sort -->
+        <div class="form-group">
+          <label>{% if lang == 'en' %}Sort By{% else %}క్రమబద్ధీకరించు{% endif %}</label>
+          <select name="sort">
+            <option value="relevance" {% if sort == 'relevance' %}selected{% endif %}>{% if lang == 'en' %}Most Played{% else %}అత్యధిక వినికిడులు{% endif %}</option>
+            <option value="newest"    {% if sort == 'newest' %}selected{% endif %}>{% if lang == 'en' %}Newest First{% else %}కొత్తవి ముందు{% endif %}</option>
+            <option value="oldest"    {% if sort == 'oldest' %}selected{% endif %}>{% if lang == 'en' %}Oldest First{% else %}పాతవి ముందు{% endif %}</option>
+            <option value="az"        {% if sort == 'az' %}selected{% endif %}>A → Z</option>
+          </select>
+        </div>
+
+      </div>
+      <div style="margin-top:0.75rem">
+        <button type="submit" class="btn-primary">{% if lang == 'en' %}Apply{% else %}వర్తించు{% endif %}</button>
+        <a href="/search" class="btn-link">{% if lang == 'en' %}Clear all{% else %}క్లియర్{% endif %}</a>
+      </div>
+    </details>
   </form>
-  {% if query %}
+
+  <!-- Results -->
+  {% if results is not none %}
     {% if results %}
-      <p class="result-count">{{ results|length }} {% if lang == 'en' %}results for{% else %}ఫలితాలు{% endif %} "{{ query }}"</p>
+      <p class="result-count">
+        {{ results|length }} {% if lang == 'en' %}result(s){% else %}ఫలితాలు{% endif %}
+        {% if query %} "{{ query }}"{% endif %}
+        {% if author %} · {{ author }}{% endif %}
+        {% if tag %} · #{{ tag }}{% endif %}
+        {% if year_from or year_to %} · {{ year_from or '?' }}–{{ year_to or '?' }}{% endif %}
+      </p>
       <div class="content-grid">
         {% for item in results %}
         <a href="/content/{{ item.id }}" class="content-card">
@@ -18,13 +107,21 @@
           <div class="card-info">
             <div class="card-title">{% if lang == 'en' and item.title_en %}{{ item.title_en }}{% else %}{{ item.title_te }}{% endif %}</div>
             {% if item.artist_author %}<div class="card-subtitle">{{ item.artist_author }}</div>{% endif %}
-            <div class="card-meta">{{ item.type }}</div>
+            <div class="card-meta">
+              {{ item.type }}{% if item.release_year %} · {{ item.release_year }}{% endif %}
+              · {{ item.play_count }} {% if lang == 'en' %}plays{% else %}వినికిడులు{% endif %}
+            </div>
+            {% if item.tags %}
+            <div class="tag-list">
+              {% for t in item.tags %}<span class="tag">{{ t }}</span>{% endfor %}
+            </div>
+            {% endif %}
           </div>
         </a>
         {% endfor %}
       </div>
     {% else %}
-      <p class="empty-msg">{% if lang == 'en' %}No results found for "{{ query }}"{% else %}"{{ query }}" కోసం ఏ ఫలితాలు కనుగొనబడలేదు.{% endif %}</p>
+      <p class="empty-msg">{% if lang == 'en' %}No results found.{% else %}ఫలితాలు కనుగొనబడలేదు.{% endif %}</p>
     {% endif %}
   {% endif %}
 </section>

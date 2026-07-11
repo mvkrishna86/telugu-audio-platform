@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'en' %}Preferences{% else %}ప్రాధాన్యతలు{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section" style="max-width:540px">
+  <h1 class="section-title">⚙️ {% if lang == 'en' %}My Preferences{% else %}నా ప్రాధాన్యతలు{% endif %}</h1>
+
+  <form action="/preferences" method="post" class="upload-form">
+
+    <div class="form-group">
+      <label>{% if lang == 'en' %}Display Language{% else %}ప్రదర్శన భాష{% endif %}</label>
+      <select name="preferred_lang">
+        <option value="te" {% if user.preferred_lang == 'te' %}selected{% endif %}>తెలుగు</option>
+        <option value="en" {% if user.preferred_lang == 'en' %}selected{% endif %}>English</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>{% if lang == 'en' %}Show me on homepage (select all that apply){% else %}హోమ్‌పేజీలో చూపించు{% endif %}</label>
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="preferred_types" value="music"
+            {% if 'music' in (user.preferred_types or []) %}checked{% endif %} />
+          {% if lang == 'en' %}Music{% else %}సంగీతం{% endif %}
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="preferred_types" value="podcast"
+            {% if 'podcast' in (user.preferred_types or []) %}checked{% endif %} />
+          Podcast
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="preferred_types" value="audiobook"
+            {% if 'audiobook' in (user.preferred_types or []) %}checked{% endif %} />
+          Audiobook
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="preferred_types" value="story"
+            {% if 'story' in (user.preferred_types or []) %}checked{% endif %} />
+          {% if lang == 'en' %}Stories{% else %}కథలు{% endif %}
+        </label>
+      </div>
+      <small style="color:var(--text-muted)">{% if lang == 'en' %}Leave all unchecked to show all types{% else %}అన్నీ ఖాళీగా వదిలితే అన్ని రకాలు చూపిస్తుంది{% endif %}</small>
+    </div>
+
+    <button type="submit" class="btn-primary">{% if lang == 'en' %}Save{% else %}సేవ్ చేయండి{% endif %}</button>
+  </form>
+</section>
+{% endblock %}

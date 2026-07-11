@@ -57,7 +57,9 @@ async def upload_content(request: Request):
     release_year = form.get("release_year", "").strip()
     description_te = form.get("description_te", "").strip()
     description_en = form.get("description_en", "").strip()
-    thumbnail    = form.get("thumbnail")
+    tags_raw   = form.get("tags", "").strip()
+    tags       = [t.strip().lower() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
+    thumbnail  = form.get("thumbnail")
 
     if not title_te or not title_en:
         raise HTTPException(status_code=400, detail="Both Telugu and English titles are required")
@@ -76,13 +78,13 @@ async def upload_content(request: Request):
     content_row = execute(
         """INSERT INTO content
            (title_te, title_en, description_te, description_en, type,
-            category_id, artist_author, release_year, thumbnail_url, is_published, uploaded_by)
-           VALUES (%s,%s,%s,%s,%s,%s::uuid,%s,%s,%s,FALSE,%s::uuid)
+            category_id, artist_author, release_year, thumbnail_url, tags, is_published, uploaded_by)
+           VALUES (%s,%s,%s,%s,%s,%s::uuid,%s,%s,%s,%s,FALSE,%s::uuid)
            RETURNING id::text""",
         (title_te, title_en, description_te, description_en, content_type,
          category_id, artist_author,
          int(release_year) if release_year.isdigit() else None,
-         thumbnail_url, user["id"])
+         thumbnail_url, tags, user["id"])
     )
     content_id = content_row["id"]
 

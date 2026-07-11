@@ -5,7 +5,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 import base64, os
 from app.config import APP_SECRET_KEY
-from app.routes import home, content, search, library, auth_routes, admin
+from app.routes import home, content, search, library, auth_routes, admin, preferences
 
 # Write CloudFront private key from base64 env var if present
 _cf_key_b64 = os.environ.get("CLOUDFRONT_PRIVATE_KEY_B64", "")
@@ -25,6 +25,7 @@ app.include_router(content.router)
 app.include_router(search.router)
 app.include_router(library.router)
 app.include_router(admin.router)
+app.include_router(preferences.router)
 
 
 @app.get("/favicon.ico", include_in_schema=False)
