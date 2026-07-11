@@ -13,7 +13,7 @@ if _cf_key_b64:
     with open("cloudfront_private_key.pem", "wb") as _f:
         _f.write(base64.b64decode(_cf_key_b64))
 
-app = FastAPI(title="తెలుగు వినండి", docs_url=None, redoc_url=None)
+app = FastAPI(title="Sraavani", docs_url=None, redoc_url=None)
 
 app.add_middleware(SessionMiddleware, secret_key=APP_SECRET_KEY, max_age=60 * 60 * 24 * 30)
 

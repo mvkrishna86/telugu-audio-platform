@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}{% if lang == 'en' %}Telugu Vinandi{% else %}తెలుగు వినండి{% endif %}{% endblock %}</title>
+  <title>{% block title %}{% if lang == 'en' %}Sraavani{% else %}శ్రావణి{% endif %}{% endblock %}</title>
   <meta name="description" content="{% block description %}{% if lang == 'en' %}Listen to Telugu songs, podcasts and audiobooks{% else %}తెలుగు పాటలు, పాడ్‌క్యాస్టులు మరియు ఆడియోబుక్‌లు వినండి{% endif %}{% endblock %}" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,7 +18,7 @@
 <body>
 
 <nav class="navbar">
-  <a href="/" class="nav-brand">🎵 {% if lang == 'en' %}Telugu Vinandi{% else %}తెలుగు వినండి{% endif %}</a>
+  <a href="/" class="nav-brand">🎵 {% if lang == 'en' %}Sraavani{% else %}శ్రావణి{% endif %}</a>
 
   <div class="nav-links">
     <a href="/browse/music">{% if lang == 'en' %}Music{% else %}సంగీతం{% endif %}</a>
@@ -111,7 +111,7 @@
 </nav>
 
 <footer class="footer">
-  <p>© 2025 తెలుగు వినండి &nbsp;|&nbsp; <a href="/privacy">{% if lang == 'en' %}Privacy Policy{% else %}గోప్యతా విధానం{% endif %}</a> &nbsp;|&nbsp; <a href="/terms">{% if lang == 'en' %}Terms{% else %}నిబంధనలు{% endif %}</a></p>
+  <p>© 2025 శ్రావణి &nbsp;|&nbsp; <a href="/privacy">{% if lang == 'en' %}Privacy Policy{% else %}గోప్యతా విధానం{% endif %}</a> &nbsp;|&nbsp; <a href="/terms">{% if lang == 'en' %}Terms{% else %}నిబంధనలు{% endif %}</a></p>
 </footer>
 
 <script src="/static/js/player.js"></script>

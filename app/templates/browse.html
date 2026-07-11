@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set type_labels_te = {"music": "సంగీతం", "podcast": "పాడ్‌క్యాస్ట్", "audiobook": "ఆడియోబుక్", "story": "కథలు"} %}
 {% set type_labels_en = {"music": "Music", "podcast": "Podcast", "audiobook": "Audiobook", "story": "Stories"} %}
-{% block title %}{% if lang == 'en' %}{{ type_labels_en[content_type] }}{% else %}{{ type_labels_te[content_type] }}{% endif %} — {% if lang == 'en' %}Telugu Vinandi{% else %}తెలుగు వినండి{% endif %}{% endblock %}
+{% block title %}{% if lang == 'en' %}{{ type_labels_en[content_type] }}{% else %}{{ type_labels_te[content_type] }}{% endif %} — {% if lang == 'en' %}Sraavani{% else %}శ్రావణి{% endif %}{% endblock %}
 
 {% block content %}
 <section class="section">

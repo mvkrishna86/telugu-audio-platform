@@ -1,4 +1,4 @@
-# తెలుగు వినండి — Telugu Audio Platform
+# శ్రావణి — Sraavani
 
 A free Telugu audio streaming platform supporting music, podcasts, audiobooks, and stories.
 Built with FastAPI (Python) + Jinja2 + PostgreSQL + AWS S3/CloudFront.

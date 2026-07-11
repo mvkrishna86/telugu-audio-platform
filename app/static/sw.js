@@ -1,4 +1,4 @@
-const CACHE = 'telugu-vinandi-v1';
+const CACHE = 'sraavani-v1';
 const SHELL = ['/', '/static/css/style.css', '/static/js/player.js', '/static/manifest.json'];
 
 self.addEventListener('install', e => {
