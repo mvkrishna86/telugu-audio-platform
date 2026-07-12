@@ -168,7 +168,7 @@ button { cursor: pointer; font-family: var(--font); }
   background: var(--bg2); border-top: 1px solid var(--bg3);
   padding: 0.5rem 1rem; z-index: 200;
   display: flex; align-items: center; gap: 0.75rem;
-  height: var(--player-h);
+  min-height: var(--player-h);
 }
 .mini-player.hidden { display: none; }
 .player-info { display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 0; }
@@ -192,7 +192,8 @@ button { cursor: pointer; font-family: var(--font); }
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--bg2); border-top: 1px solid var(--bg3);
   z-index: 199;
-  height: var(--bottom-nav-h);
+  height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   justify-content: space-around; align-items: center;
 }
 .bottom-nav a {
