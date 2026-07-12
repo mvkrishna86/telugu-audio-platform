@@ -109,7 +109,9 @@ button { cursor: pointer; font-family: var(--font); }
   display: flex; align-items: center; gap: 0.75rem;
   padding: 0.75rem; background: var(--card-bg);
   border-radius: 8px; margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
+.ep-info { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
 .ep-num { background: var(--bg3); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
 .ep-title { flex: 1; font-size: 0.9rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ep-duration { color: var(--text-muted); font-size: 0.8rem; white-space: nowrap; }
@@ -291,8 +293,11 @@ button { cursor: pointer; font-family: var(--font); }
   .detail-meta h1 { font-size: 1.3rem; }
 
   /* Episode rows: keep tighter */
-  .episode-row { gap: 0.5rem; padding: 0.6rem; }
-  .ep-title { font-size: 0.85rem; }
+  .episode-row { gap: 0.4rem; padding: 0.6rem; }
+  .ep-info { width: 100%; }
+  .ep-title { font-size: 0.85rem; white-space: normal; }
+  .btn-play { width: 100%; justify-content: center; display: flex; }
+  .resume-badge { width: 100%; }
 
   /* Admin table: horizontal scroll */
   .admin-table { font-size: 0.8rem; }
