@@ -18,7 +18,10 @@
 <body>
 
 <nav class="navbar">
-  <a href="/" class="nav-brand">{% if lang == 'en' %}Sraavani{% else %}శ్రావణి{% endif %}</a>
+  <a href="/" class="nav-brand">
+    <img src="/static/icons/logo.svg" alt="" class="nav-logo" />
+    {% if lang == 'en' %}Sraavani{% else %}శ్రావణి{% endif %}
+  </a>
 
   <div class="nav-links">
     <a href="/browse/music">{% if lang == 'en' %}Music{% else %}సంగీతం{% endif %}</a>
