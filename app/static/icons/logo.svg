@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="100" fill="#1a0a2e"/>
+
+  <!-- Headphone arc -->
+  <path d="M 40 100 A 60 60 0 0 1 160 100" fill="none" stroke="#f5a623" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Left ear cup -->
+  <rect x="28" y="95" width="26" height="38" rx="10" fill="#f5a623"/>
+
+  <!-- Right ear cup -->
+  <rect x="146" y="95" width="26" height="38" rx="10" fill="#f5a623"/>
+
+  <!-- శ letter inside left ear cup -->
+  <text x="41" y="121" text-anchor="middle" font-family="Noto Sans Telugu, sans-serif" font-size="20" font-weight="700" fill="#1a0a2e">శ</text>
+
+  <!-- App name below -->
+  <text x="100" y="172" text-anchor="middle" font-family="Noto Sans Telugu, Noto Sans, sans-serif" font-size="15" font-weight="700" fill="#f5a623" letter-spacing="1">శ్రావణి</text>
+  <text x="100" y="190" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#9d89bf" letter-spacing="2">SRAAVANI</text>
+</svg>
