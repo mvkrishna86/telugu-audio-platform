@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}User Management — Sraavani Admin{% endblock %}
+
+{% block content %}
+<section class="section admin-section">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.5rem;">
+    <h1>User Management</h1>
+    <a href="/admin" class="btn-link">← Dashboard</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-cards">
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.total }}</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.admins }}</div>
+      <div class="stat-label">Admins</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ stats.active }}</div>
+      <div class="stat-label">Active (listened)</div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <form action="/admin/users" method="get" style="display:flex; gap:0.75rem; margin-bottom:1.5rem;">
+    <input type="text" name="q" value="{{ search_q }}"
+      placeholder="Search by name or email..."
+      style="flex:1; background:var(--bg3); border:1px solid var(--bg3); color:var(--text); padding:0.6rem 1rem; border-radius:24px; font-family:var(--font); font-size:0.95rem;" />
+    <select name="role" style="background:var(--bg3); color:var(--text); border:none; border-radius:8px; padding:0.6rem; font-family:var(--font);">
+      <option value="">All roles</option>
+      <option value="listener"   {% if role_filter == 'listener' %}selected{% endif %}>Listeners</option>
+      <option value="admin"      {% if role_filter == 'admin' %}selected{% endif %}>Admins</option>
+      <option value="superadmin" {% if role_filter == 'superadmin' %}selected{% endif %}>Superadmins</option>
+    </select>
+    <button type="submit" class="btn-primary">Filter</button>
+    <a href="/admin/users" class="btn-link">Clear</a>
+  </form>
+
+  <!-- User table -->
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Language</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            {% if u.avatar_url %}
+            <img src="{{ u.avatar_url }}" style="width:24px;height:24px;border-radius:50%;vertical-align:middle;margin-right:0.4rem;" alt="" />
+            {% endif %}
+            {{ u.name or '—' }}
+          </td>
+          <td>{{ u.email or u.phone or '—' }}</td>
+          <td>
+            <span class="badge {% if u.role == 'superadmin' %}badge-green{% elif u.role == 'admin' %}badge-green{% else %}badge-gray{% endif %}">
+              {{ u.role }}
+            </span>
+          </td>
+          <td>{{ u.preferred_lang | upper }}</td>
+          <td style="white-space:nowrap">{{ u.created_at[:10] if u.created_at else '—' }}</td>
+          <td>
+            {% if u.id != current_user.id %}
+            <form action="/admin/users/{{ u.id }}/role" method="post" style="display:inline-flex; gap:0.4rem; align-items:center;">
+              <select name="role" style="background:var(--bg3); color:var(--text); border:none; border-radius:6px; padding:0.2rem 0.4rem; font-size:0.8rem;">
+                <option value="listener"   {% if u.role == 'listener' %}selected{% endif %}>listener</option>
+                <option value="admin"      {% if u.role == 'admin' %}selected{% endif %}>admin</option>
+                {% if current_user.role == 'superadmin' %}
+                <option value="superadmin" {% if u.role == 'superadmin' %}selected{% endif %}>superadmin</option>
+                {% endif %}
+              </select>
+              <button type="submit" class="btn-link" style="font-size:0.8rem;">Save</button>
+            </form>
+            {% else %}
+            <span style="color:var(--text-muted);font-size:0.8rem;">You</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if not users %}
+  <p class="empty-msg">No users found.</p>
+  {% endif %}
+
+  <!-- Pagination -->
+  {% if total_pages > 1 %}
+  <div style="display:flex; gap:0.5rem; margin-top:1.5rem; flex-wrap:wrap;">
+    {% for p in range(1, total_pages + 1) %}
+    <a href="/admin/users?q={{ search_q }}&role={{ role_filter }}&page={{ p }}"
+       style="padding:0.3rem 0.75rem; border-radius:6px; background:{% if p == page %}var(--accent){% else %}var(--bg3){% endif %}; color:{% if p == page %}#000{% else %}var(--text){% endif %}; font-size:0.85rem;">
+      {{ p }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</section>
+{% endblock %}
