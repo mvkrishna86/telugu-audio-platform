@@ -8,6 +8,7 @@ from app.auth import require_admin
 from app.storage import upload_file_to_s3, delete_s3_object
 from app.config import MAX_UPLOAD_BYTES, ALLOWED_AUDIO_TYPES, ALLOWED_IMAGE_TYPES
 from app.lang import lang_context
+from app.converter import convert_to_mp3
 
 router = APIRouter(prefix="/admin")
 templates = Jinja2Templates(directory="app/templates")
@@ -104,7 +105,10 @@ async def upload_content(request: Request):
         if audio_file.content_type not in ALLOWED_AUDIO_TYPES:
             raise HTTPException(status_code=400, detail=f"Invalid audio type for part {idx+1}")
 
-        audio_key = upload_file_to_s3(audio_bytes, audio_file.content_type, "audio")
+        # Convert WAV → MP3 automatically
+        audio_bytes, audio_content_type = convert_to_mp3(audio_bytes, audio_file.content_type)
+
+        audio_key = upload_file_to_s3(audio_bytes, audio_content_type, "audio")
         part_title_te = form.get(f"parts[{idx}][title_te]", "").strip()
         part_title_en = form.get(f"parts[{idx}][title_en]", "").strip()
 
@@ -147,7 +151,9 @@ async def add_parts(request: Request, content_id: str):
         if audio_file.content_type not in ALLOWED_AUDIO_TYPES:
             raise HTTPException(status_code=400, detail=f"Invalid audio type")
 
-        audio_key = upload_file_to_s3(audio_bytes, audio_file.content_type, "audio")
+        # Convert WAV → MP3 automatically
+        audio_bytes, audio_content_type = convert_to_mp3(audio_bytes, audio_file.content_type)
+        audio_key = upload_file_to_s3(audio_bytes, audio_content_type, "audio")
         part_title_te = form.get(f"parts[{idx}][title_te]", "").strip()
         part_title_en = form.get(f"parts[{idx}][title_en]", "").strip()
 
