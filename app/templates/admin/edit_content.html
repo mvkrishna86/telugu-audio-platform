@@ -33,10 +33,16 @@
     </thead>
     <tbody>
       {% for af in audio_files %}
-      <tr>
+      <tr id="part-row-{{ af.id }}">
         <td>{{ af.part_number }}</td>
-        <td>{{ af.title_te or '—' }}</td>
-        <td>{{ af.title_en or '—' }}</td>
+        <!-- Telugu title — click to edit -->
+        <td>
+          <span class="editable-title" onclick="editTitle('{{ af.id }}', 'te', this)">{{ af.title_te or '—' }}</span>
+        </td>
+        <!-- English title — click to edit -->
+        <td>
+          <span class="editable-title" onclick="editTitle('{{ af.id }}', 'en', this)">{{ af.title_en or '—' }}</span>
+        </td>
         <td>{% if af.duration_sec %}{{ af.duration_sec // 60 }}:{{ '%02d' % (af.duration_sec % 60) }}{% else %}—{% endif %}</td>
         <td>{% if af.file_size_bytes %}{{ (af.file_size_bytes / 1024 / 1024) | round(1) }} MB{% else %}—{% endif %}</td>
         <td>
@@ -85,7 +91,42 @@
 {% endblock %}
 
 {% block scripts %}
+<style>
+.editable-title { cursor: pointer; border-bottom: 1px dashed var(--text-muted); padding-bottom: 1px; }
+.editable-title:hover { color: var(--accent); border-color: var(--accent); }
+.inline-edit-input { background: var(--bg3); border: 1px solid var(--accent); color: var(--text); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: var(--font); font-size: 0.85rem; width: 140px; }
+</style>
 <script>
+async function editTitle(fileId, lang, spanEl) {
+  const current = spanEl.textContent === '—' ? '' : spanEl.textContent;
+  const input = document.createElement('input');
+  input.className = 'inline-edit-input';
+  input.value = current;
+  input.placeholder = lang === 'te' ? 'తెలుగు శీర్షిక' : 'English title';
+  spanEl.replaceWith(input);
+  input.focus();
+
+  async function save() {
+    const newVal = input.value.trim();
+    const resp = await fetch(`/admin/audiofile/${fileId}/title`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({lang, title: newVal}),
+    });
+    const span = document.createElement('span');
+    span.className = 'editable-title';
+    span.onclick = () => editTitle(fileId, lang, span);
+    span.textContent = newVal || '—';
+    input.replaceWith(span);
+  }
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { input.value = current; input.blur(); }
+  });
+}
+
 let newPartCount = 1;
 const existingCount = {{ audio_files|length }};
 

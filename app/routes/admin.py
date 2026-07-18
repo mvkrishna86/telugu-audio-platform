@@ -210,6 +210,17 @@ async def delete_content(request: Request, content_id: str):
     return RedirectResponse("/admin", status_code=303)
 
 
+@router.post("/audiofile/{audio_file_id}/title")
+async def update_audio_title(request: Request, audio_file_id: str):
+    require_admin(request)
+    body = await request.json()
+    lang = body.get("lang", "te")
+    title = body.get("title", "").strip() or None
+    col = "title_te" if lang == "te" else "title_en"
+    execute(f"UPDATE audio_files SET {col}=%s WHERE id=%s::uuid", (title, audio_file_id))
+    return {"ok": True}
+
+
 @router.post("/audiofile/{audio_file_id}/delete")
 async def delete_audio_file(request: Request, audio_file_id: str):
     """Delete a single audio part."""
