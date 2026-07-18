@@ -176,7 +176,9 @@ button { cursor: pointer; font-family: var(--font); }
 .player-info img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
 .player-text { min-width: 0; }
 .player-title { font-weight: 600; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.player-subtitle { color: var(--text-muted); font-size: 0.7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player-subtitle { color: var(--text-muted); font-size: 0.7rem; display: flex; align-items: center; gap: 0.35rem; overflow: hidden; }
+.player-chapter-badge { background: var(--accent); color: #000; font-size: 0.6rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+#player-subtitle-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .player-controls { display: flex; gap: 0.25rem; align-items: center; flex-shrink: 0; }
 .player-controls button { background: none; border: none; color: var(--text); font-size: 0.85rem; padding: 0.3rem 0.4rem; min-width: 32px; min-height: 32px; }
 #btn-prev, #btn-next { font-size: 1rem; color: var(--text-muted); transition: color .2s, opacity .2s; }

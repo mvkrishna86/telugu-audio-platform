@@ -16,15 +16,31 @@ async function playAudio(fileId, title, subtitle, thumbUrl) {
 
   // Update mini-player UI
   document.getElementById('player-title').textContent = title;
-  document.getElementById('player-subtitle').textContent = subtitle;
+  document.getElementById('player-subtitle-text').textContent = subtitle;
   document.getElementById('player-thumb').src = thumbUrl || '/static/icons/default-thumb.png';
   document.getElementById('btn-play-pause').textContent = '⏸';
   player.classList.remove('hidden');
 
-  // Highlight active chapter row, remove from others
+  // Show chapter badge if multi-chapter content
+  const chapters = window.chapterList || [];
+  const chapterIdx = chapters.findIndex(c => c.id === fileId);
+  const badge = document.getElementById('player-chapter-badge');
+  if (badge) {
+    if (chapters.length > 1 && chapterIdx !== -1) {
+      badge.textContent = `Part ${chapterIdx + 1}/${chapters.length}`;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  // Highlight active chapter row and scroll it into view
   document.querySelectorAll('.episode-row').forEach(row => row.classList.remove('ep-active'));
   const activeRow = document.getElementById(`ep-${fileId}`);
-  if (activeRow) activeRow.classList.add('ep-active');
+  if (activeRow) {
+    activeRow.classList.add('ep-active');
+    activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 
   updateNavButtons();
 
