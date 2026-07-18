@@ -26,6 +26,8 @@ async function playAudio(fileId, title, subtitle, thumbUrl) {
   const activeRow = document.getElementById(`ep-${fileId}`);
   if (activeRow) activeRow.classList.add('ep-active');
 
+  updateNavButtons();
+
   // Restore saved position if any
   const saved = sessionStorage.getItem(`pos_${fileId}`);
   if (saved && parseFloat(saved) > 5) {
@@ -38,9 +40,37 @@ function playNextChapter() {
   if (!chapters || !currentFileId) return;
   const idx = chapters.findIndex(c => c.id === currentFileId);
   if (idx !== -1 && idx < chapters.length - 1) {
-    const next = chapters[idx + 1];
-    playAudio(next.id, next.title, next.subtitle, next.thumb);
+    playAudio(chapters[idx + 1].id, chapters[idx + 1].title, chapters[idx + 1].subtitle, chapters[idx + 1].thumb);
   }
+}
+
+function playPrevChapter() {
+  const chapters = window.chapterList;
+  if (!chapters || !currentFileId) return;
+  const idx = chapters.findIndex(c => c.id === currentFileId);
+  // If more than 3 seconds in, restart current chapter instead of going back
+  if (audio.currentTime > 3) {
+    audio.currentTime = 0;
+    return;
+  }
+  if (idx > 0) {
+    playAudio(chapters[idx - 1].id, chapters[idx - 1].title, chapters[idx - 1].subtitle, chapters[idx - 1].thumb);
+  }
+}
+
+function updateNavButtons() {
+  const chapters = window.chapterList;
+  const prev = document.getElementById('btn-prev');
+  const next = document.getElementById('btn-next');
+  if (!prev || !next) return;
+  if (!chapters || chapters.length <= 1) {
+    prev.style.display = 'none';
+    next.style.display = 'none';
+    return;
+  }
+  const idx = chapters.findIndex(c => c.id === currentFileId);
+  prev.style.opacity = idx > 0 ? '1' : '0.3';
+  next.style.opacity = (idx !== -1 && idx < chapters.length - 1) ? '1' : '0.3';
 }
 
 function togglePlay() {
@@ -101,8 +131,7 @@ audio.addEventListener('loadedmetadata', () => {
 audio.addEventListener('ended', () => {
   document.getElementById('btn-play-pause').textContent = '▶';
   savePositionToServer();
-  // Auto-play next chapter after 1 second pause
-  setTimeout(playNextChapter, 1000);
+  setTimeout(() => { playNextChapter(); updateNavButtons(); }, 1000);
 });
 
 audio.addEventListener('pause', () => {

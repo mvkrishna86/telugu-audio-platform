@@ -179,6 +179,8 @@ button { cursor: pointer; font-family: var(--font); }
 .player-subtitle { color: var(--text-muted); font-size: 0.7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .player-controls { display: flex; gap: 0.25rem; align-items: center; flex-shrink: 0; }
 .player-controls button { background: none; border: none; color: var(--text); font-size: 0.85rem; padding: 0.3rem 0.4rem; min-width: 32px; min-height: 32px; }
+#btn-prev, #btn-next { font-size: 1rem; color: var(--text-muted); transition: color .2s, opacity .2s; }
+#btn-prev:hover, #btn-next:hover { color: var(--accent); }
 #btn-play-pause { background: var(--accent); color: #000; border-radius: 50%; width: 40px; height: 40px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
 .player-progress { display: flex; align-items: center; gap: 0.4rem; flex: 2; min-width: 0; }
 .player-progress span { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }

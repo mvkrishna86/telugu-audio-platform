@@ -63,9 +63,11 @@
     </div>
   </div>
   <div class="player-controls">
-    <button onclick="seekBy(-15)">⏪ 15</button>
+    <button id="btn-prev" onclick="playPrevChapter()" title="Previous chapter">⏮</button>
+    <button onclick="seekBy(-15)">⏪15</button>
     <button id="btn-play-pause" onclick="togglePlay()">▶</button>
-    <button onclick="seekBy(15)">15 ⏩</button>
+    <button onclick="seekBy(15)">15⏩</button>
+    <button id="btn-next" onclick="playNextChapter()" title="Next chapter">⏭</button>
   </div>
   <div class="player-progress">
     <span id="player-current">0:00</span>
