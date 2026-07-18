@@ -43,9 +43,30 @@ def _rsa_signer(message: bytes) -> bytes:
     return private_key.sign(message, padding.PKCS1v15(), hashes.SHA1())  # noqa: S303 – CloudFront requires SHA1
 
 
-def get_signed_url(s3_key: str) -> str:
-    """Return a CloudFront signed URL valid for SIGNED_URL_EXPIRY_SECONDS."""
+def get_signed_url(s3_key: str, expiry_seconds: int = None) -> str:
+    """Return a CloudFront signed URL."""
+    if expiry_seconds is None:
+        expiry_seconds = SIGNED_URL_EXPIRY_SECONDS
     cf_signer = CloudFrontSigner(CLOUDFRONT_KEY_PAIR_ID, _rsa_signer)
-    expire_at = datetime.datetime.utcnow() + datetime.timedelta(seconds=SIGNED_URL_EXPIRY_SECONDS)
+    expire_at = datetime.datetime.utcnow() + datetime.timedelta(seconds=expiry_seconds)
     url = f"{CLOUDFRONT_DOMAIN.rstrip('/')}/{s3_key}"
     return cf_signer.generate_presigned_url(url, date_less_than=expire_at)
+
+
+def thumb_url(s3_key_or_url: str) -> str:
+    """
+    Return a signed CloudFront URL for a thumbnail.
+    Accepts either a bare S3 key (thumbnails/uuid) or a legacy full URL.
+    Thumbnails use a 7-day expiry since they are static images.
+    """
+    if not s3_key_or_url:
+        return "/static/icons/default-thumb.png"
+    # Legacy full URL stored before the fix — extract the key
+    if s3_key_or_url.startswith("http"):
+        from urllib.parse import urlparse
+        path = urlparse(s3_key_or_url).path.lstrip("/")
+        s3_key_or_url = path
+    try:
+        return get_signed_url(s3_key_or_url, expiry_seconds=7 * 24 * 3600)
+    except Exception:
+        return "/static/icons/default-thumb.png"

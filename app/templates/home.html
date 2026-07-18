@@ -30,7 +30,7 @@
   <div class="content-grid">
     {% for item in featured %}
     <a href="/content/{{ item.id }}" class="content-card">
-      <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+      <img src="{{ item.thumbnail_url | thumb_url }}" alt="{{ item.title_te }}" />
       <div class="card-info">
         <div class="card-title">{% if lang == 'en' and item.title_en %}{{ item.title_en }}{% else %}{{ item.title_te }}{% endif %}</div>
         <div class="card-meta">{{ item.type }} · {{ item.play_count }} {% if lang == 'en' %}plays{% else %}వినికిడులు{% endif %}</div>
@@ -47,7 +47,7 @@
   <div class="content-grid">
     {% for item in recent %}
     <a href="/content/{{ item.id }}" class="content-card">
-      <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+      <img src="{{ item.thumbnail_url | thumb_url }}" alt="{{ item.title_te }}" />
       <div class="card-info">
         <div class="card-title">{% if lang == 'en' and item.title_en %}{{ item.title_en }}{% else %}{{ item.title_te }}{% endif %}</div>
         <div class="card-meta">{{ item.type }}</div>

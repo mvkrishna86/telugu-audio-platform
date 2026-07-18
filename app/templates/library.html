@@ -10,7 +10,7 @@
   <div class="content-grid">
     {% for h in history %}
     <a href="/content/{{ h.c_id }}" class="content-card">
-      <img src="{{ h.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ h.title_te }}" />
+      <img src="{{ h.thumbnail_url | thumb_url }}" alt="{{ h.title_te }}" />
       <div class="card-info">
         <div class="card-title">{{ h.title_te }}</div>
         <div class="card-meta">{{ (h.position_sec // 60) }}:{{ '%02d' % (h.position_sec % 60) }} {% if lang == 'en' %}paused{% else %}వద్ద ఆపబడింది{% endif %}</div>
@@ -25,7 +25,7 @@
   <div class="content-grid">
     {% for b in bookmarks %}
     <a href="/content/{{ b.id }}" class="content-card">
-      <img src="{{ b.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ b.title_te }}" />
+      <img src="{{ b.thumbnail_url | thumb_url }}" alt="{{ b.title_te }}" />
       <div class="card-info">
         <div class="card-title">{% if lang == 'en' and b.title_en %}{{ b.title_en }}{% else %}{{ b.title_te }}{% endif %}</div>
         <div class="card-meta">{{ b.type }}</div>

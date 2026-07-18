@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates_env import templates
 
 from app.db import query, query_one, execute
 from app.auth import require_admin
 from app.lang import lang_context
 
 router = APIRouter(prefix="/admin/users")
-templates = Jinja2Templates(directory="app/templates")
 
 PAGE_SIZE = 20
 

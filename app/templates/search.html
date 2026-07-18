@@ -103,7 +103,7 @@
       <div class="content-grid">
         {% for item in results %}
         <a href="/content/{{ item.id }}" class="content-card">
-          <img src="{{ item.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ item.title_te }}" />
+          <img src="{{ item.thumbnail_url | thumb_url }}" alt="{{ item.title_te }}" />
           <div class="card-info">
             <div class="card-title">{% if lang == 'en' and item.title_en %}{{ item.title_en }}{% else %}{{ item.title_te }}{% endif %}</div>
             {% if item.artist_author %}<div class="card-subtitle">{{ item.artist_author }}</div>{% endif %}

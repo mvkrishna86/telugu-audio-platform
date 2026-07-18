@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates_env import templates
 from typing import List
 
 from app.db import query, query_one, execute
@@ -11,7 +11,6 @@ from app.lang import lang_context
 from app.converter import convert_to_mp3
 
 router = APIRouter(prefix="/admin")
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("", response_class=HTMLResponse)
@@ -72,8 +71,8 @@ async def upload_content(request: Request):
         if thumbnail.content_type not in ALLOWED_IMAGE_TYPES:
             raise HTTPException(status_code=400, detail="Invalid image type")
         thumb_key = upload_file_to_s3(thumb_bytes, thumbnail.content_type, "thumbnails")
-        from app.config import CLOUDFRONT_DOMAIN
-        thumbnail_url = f"{CLOUDFRONT_DOMAIN.rstrip('/')}/{thumb_key}"
+        # Store the S3 key — we generate signed URLs at render time
+        thumbnail_url = thumb_key
 
     # Create content row
     content_row = execute(

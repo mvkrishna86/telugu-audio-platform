@@ -4,7 +4,7 @@
 {% block content %}
 <section class="content-detail">
   <div class="detail-header">
-    <img src="{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}" alt="{{ content.title_te }}" class="detail-thumb" />
+    <img src="{{ content.thumbnail_url | thumb_url }}" alt="{{ content.title_te }}" class="detail-thumb" />
     <div class="detail-meta">
       <span class="badge">{{ content.type }}</span>
       <h1>{% if lang == 'en' and content.title_en %}{{ content.title_en }}{% else %}{{ content.title_te }}{% endif %}</h1>
@@ -71,7 +71,7 @@ window.chapterList = [
     id: "{{ af.id }}",
     title: "{% set pt = (af.title_en if lang == 'en' else af.title_te) or af.title_te or af.title_en %}{% if pt and pt.strip() %}{{ pt|replace('"','\\"') }}{% elif lang == 'en' and content.title_en %}{{ content.title_en|replace('"','\\"') }} Part {{ af.part_number }}{% else %}{{ content.title_te|replace('"','\\"') }} భాగం {{ af.part_number }}{% endif %}",
     subtitle: "{% if lang == 'en' and content.title_en %}{{ content.title_en|replace('"','\\"') }}{% else %}{{ content.title_te|replace('"','\\"') }}{% endif %}",
-    thumb: "{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}"
+    thumb: "{{ content.thumbnail_url | thumb_url }}"
   }{% if not loop.last %},{% endif %}
   {% endfor %}
 ];

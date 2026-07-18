@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates_env import templates
 
 from app.auth import require_login
 from app.db import execute, query_one
 from app.lang import lang_context
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/preferences", response_class=HTMLResponse)
