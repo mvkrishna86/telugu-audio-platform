@@ -71,7 +71,7 @@
         </div>
         <div class="form-group">
           <label>Audio File * (MP3/AAC, max 500 MB)</label>
-          <input type="file" name="parts[0][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a" required />
+          <input type="file" name="parts[0][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a,audio/wav,audio/x-wav" required />
         </div>
       </div>
     </div>
@@ -113,7 +113,7 @@ function addNewPart() {
     </div>
     <div class="form-group">
       <label>Audio File * (MP3/AAC, max 500 MB)</label>
-      <input type="file" name="parts[${idx}][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a,audio/wav,audio/x-wav" required />
+      <input type="file" name="parts[${idx}][audio]" accept="audio/mpeg,audio/mp4,audio/aac,audio/x-m4a,audio/wav,audio/x-wav,audio/wave" required />
     </div>`;
   container.appendChild(div);
 }

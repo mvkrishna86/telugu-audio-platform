@@ -34,10 +34,10 @@
       <div class="ep-info">
         <span class="ep-num">{{ af.part_number }}</span>
         <span class="ep-title">
-          {% if lang == 'en' and af.title_en %}{{ af.title_en }}
-          {% elif af.title_te %}{{ af.title_te }}
-          {% elif lang == 'en' and content.title_en %}{{ content.title_en }}
-          {% else %}{{ content.title_te }}{% endif %}
+          {% set part_title = (af.title_en if lang == 'en' else af.title_te) or af.title_te or af.title_en %}
+          {% if part_title and part_title.strip() %}{{ part_title }}
+          {% elif lang == 'en' and content.title_en %}{{ content.title_en }} — Part {{ af.part_number }}
+          {% else %}{{ content.title_te }} — భాగం {{ af.part_number }}{% endif %}
         </span>
         {% if af.duration_sec %}
         <span class="ep-duration">{{ (af.duration_sec // 60) }}:{{ '%02d' % (af.duration_sec % 60) }}</span>
@@ -69,7 +69,7 @@ window.chapterList = [
   {% for af in audio_files %}
   {
     id: "{{ af.id }}",
-    title: "{% if lang == 'en' and af.title_en %}{{ af.title_en|replace('"','\\"') }}{% elif af.title_te %}{{ af.title_te|replace('"','\\"') }}{% else %}{{ content.title_te|replace('"','\\"') }}{% endif %}",
+    title: "{% set pt = (af.title_en if lang == 'en' else af.title_te) or af.title_te or af.title_en %}{% if pt and pt.strip() %}{{ pt|replace('"','\\"') }}{% elif lang == 'en' and content.title_en %}{{ content.title_en|replace('"','\\"') }} Part {{ af.part_number }}{% else %}{{ content.title_te|replace('"','\\"') }} భాగం {{ af.part_number }}{% endif %}",
     subtitle: "{% if lang == 'en' and content.title_en %}{{ content.title_en|replace('"','\\"') }}{% else %}{{ content.title_te|replace('"','\\"') }}{% endif %}",
     thumb: "{{ content.thumbnail_url or '/static/icons/default-thumb.png' }}"
   }{% if not loop.last %},{% endif %}
