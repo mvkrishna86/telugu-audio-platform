@@ -44,10 +44,7 @@
         {% endif %}
       </div>
       {% if user %}
-        <button class="btn-play" onclick="playAudio('{{ af.id }}',
-          '{% if lang == 'en' and af.title_en %}{{ af.title_en|replace("'","\\'") }}{% elif af.title_te %}{{ af.title_te|replace("'","\\'") }}{% else %}{{ content.title_te|replace("'","\\'") }}{% endif %}',
-          '{% if lang == 'en' and content.title_en %}{{ content.title_en|replace("'","\\'") }}{% else %}{{ content.title_te|replace("'","\\'") }}{% endif %}',
-          '{{ content.thumbnail_url }}')">
+        <button class="btn-play" onclick="playFromList('{{ af.id }}')">
           ▶ {% if lang == 'en' %}Play{% else %}వినండి{% endif %}
         </button>
       {% else %}
@@ -75,6 +72,11 @@ window.chapterList = [
   }{% if not loop.last %},{% endif %}
   {% endfor %}
 ];
+
+function playFromList(fileId) {
+  const ch = (window.chapterList || []).find(c => c.id === fileId);
+  if (ch) playAudio(ch.id, ch.title, ch.subtitle, ch.thumb);
+}
 
 async function toggleBookmark(contentId) {
   const resp = await fetch(`/library/bookmark/${contentId}`, {method: 'POST'});
