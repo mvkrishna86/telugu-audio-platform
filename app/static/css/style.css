@@ -477,3 +477,136 @@ body.is-playing .nav-logo .wave-bar:nth-child(5) { animation-delay: 0s; }
 .bottom-nav a.active { color: var(--accent); }
 .bottom-nav a .bn-icon { transition: transform .2s; }
 .bottom-nav a:hover .bn-icon { transform: translateY(-2px); }
+
+/* ════════════════════════════════════════════
+   MEDIUM-IMPACT UI ENHANCEMENTS (6–12)
+   ════════════════════════════════════════════ */
+
+/* 6 ── Hero animated gradient background */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 3.5rem 1rem;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(245,166,35,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 50%, rgba(224,92,151,0.10) 0%, transparent 60%);
+  animation: hero-pulse 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes hero-pulse {
+  from { opacity: 0.6; transform: scale(1); }
+  to   { opacity: 1;   transform: scale(1.05); }
+}
+.hero h1, .hero p, .hero a { position: relative; }
+
+/* 7 ── Thicker glowing seek bar */
+#player-seek {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--bg3);
+  cursor: pointer;
+  flex: 1;
+}
+#player-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--gradient);
+  box-shadow: 0 0 8px rgba(245,166,35,0.6);
+  cursor: pointer;
+  transition: transform .15s;
+}
+#player-seek::-webkit-slider-thumb:hover { transform: scale(1.3); }
+#player-seek::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+}
+
+/* 8 ── Category pills gradient fill on hover */
+.category-card {
+  background: var(--bg3);
+  border: 1px solid transparent;
+  transition: background .25s, color .25s, box-shadow .25s, border-color .25s;
+}
+.category-card:hover {
+  background: var(--gradient);
+  color: #000;
+  box-shadow: var(--glow);
+  border-color: transparent;
+}
+
+/* 9 ── Skeleton loading shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, #2e1a50 50%, var(--bg3) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius);
+}
+
+/* 10 ── Rounder thumbnail corners */
+.content-card img {
+  border-radius: 0;
+}
+.detail-thumb {
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.player-info img {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* 11 ── Content type badge colors per type */
+.badge-music    { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+.badge-podcast  { background: rgba(100,149,237,0.15); color: #6495ed; border: 1px solid rgba(100,149,237,0.3); }
+.badge-audiobook{ background: rgba(80,200,120,0.15); color: #50c878; border: 1px solid rgba(80,200,120,0.3); }
+.badge-story    { background: rgba(224,92,151,0.15); color: #e05c97; border: 1px solid rgba(224,92,151,0.3); }
+
+/* 12 ── Active nav links on desktop */
+.nav-links a {
+  position: relative;
+  padding-bottom: 2px;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute; bottom: -2px; left: 0; right: 0;
+  height: 2px;
+  background: var(--gradient);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform .2s ease;
+}
+.nav-links a:hover::after,
+.nav-links a.nav-active::after { transform: scaleX(1); }
+.nav-links a:hover { color: var(--text); }
+
+/* ── Episode row polish ── */
+.episode-row {
+  border: 1px solid transparent;
+  transition: background .2s, border-color .2s;
+}
+.episode-row:hover {
+  background: rgba(245,166,35,0.05);
+  border-color: var(--glass-border);
+}
+
+/* ── Login box glass ── */
+.login-box {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}

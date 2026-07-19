@@ -6,7 +6,7 @@
   <div class="detail-header">
     <img src="{{ content.thumbnail_url | thumb_url }}" alt="{{ content.title_te }}" class="detail-thumb" />
     <div class="detail-meta">
-      <span class="badge">{{ content.type }}</span>
+      <span class="badge badge-{{ content.type }}">{{ content.type }}</span>
       <h1>{% if lang == 'en' and content.title_en %}{{ content.title_en }}{% else %}{{ content.title_te }}{% endif %}</h1>
       {% if content.title_en and content.title_te %}
         <h2 class="subtitle">{% if lang == 'en' %}{{ content.title_te }}{% else %}{{ content.title_en }}{% endif %}</h2>

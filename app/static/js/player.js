@@ -182,13 +182,16 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/static/sw.js').catch(() => {});
 }
 
-// Highlight active bottom nav item
+// Highlight active nav items (bottom nav + desktop nav)
 (function() {
   const path = window.location.pathname;
-  document.querySelectorAll('.bottom-nav a').forEach(a => {
+  document.querySelectorAll('.bottom-nav a, .nav-links a').forEach(a => {
     const href = a.getAttribute('href');
-    if (href === '/' ? path === '/' : path.startsWith(href)) {
+    if (!href) return;
+    const isActive = href === '/' ? path === '/' : path.startsWith(href);
+    if (isActive) {
       a.classList.add('active');
+      a.classList.add('nav-active');
     }
   });
 })();
