@@ -152,10 +152,12 @@ audio.addEventListener('ended', () => {
 
 audio.addEventListener('pause', () => {
   document.getElementById('btn-play-pause').textContent = '▶';
+  document.body.classList.remove('is-playing');
 });
 
 audio.addEventListener('play', () => {
   document.getElementById('btn-play-pause').textContent = '⏸';
+  document.body.classList.add('is-playing');
 });
 
 async function savePositionToServer() {
@@ -179,3 +181,14 @@ window.addEventListener('beforeunload', savePositionToServer);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/static/sw.js').catch(() => {});
 }
+
+// Highlight active bottom nav item
+(function() {
+  const path = window.location.pathname;
+  document.querySelectorAll('.bottom-nav a').forEach(a => {
+    const href = a.getAttribute('href');
+    if (href === '/' ? path === '/' : path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
