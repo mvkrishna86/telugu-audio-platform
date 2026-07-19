@@ -182,16 +182,27 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/static/sw.js').catch(() => {});
 }
 
-// Highlight active nav items (bottom nav + desktop nav)
-(function() {
+function highlightActiveNav() {
   const path = window.location.pathname;
   document.querySelectorAll('.bottom-nav a, .nav-links a').forEach(a => {
+    a.classList.remove('active', 'nav-active');
     const href = a.getAttribute('href');
     if (!href) return;
     const isActive = href === '/' ? path === '/' : path.startsWith(href);
-    if (isActive) {
-      a.classList.add('active');
-      a.classList.add('nav-active');
-    }
+    if (isActive) { a.classList.add('active', 'nav-active'); }
   });
-})();
+}
+
+highlightActiveNav();
+
+// Re-run page scripts and nav highlight after HTMX swaps
+document.addEventListener('htmx:afterSwap', () => {
+  highlightActiveNav();
+  // Re-init chapterList if page has it
+  const scripts = document.getElementById('main-content')?.querySelectorAll('script');
+  if (scripts) scripts.forEach(s => { if (s.textContent.includes('chapterList')) eval(s.textContent); });
+});
+
+document.addEventListener('htmx:afterSettle', () => {
+  highlightActiveNav();
+});

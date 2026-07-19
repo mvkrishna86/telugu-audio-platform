@@ -15,7 +15,7 @@
   <meta name="theme-color" content="#1a0a2e" />
   {% block head %}{% endblock %}
 </head>
-<body>
+<body hx-boost="true" hx-target="#main-content" hx-select="#main-content" hx-swap="innerHTML" hx-push-url="true">
 
 <nav class="navbar">
   <a href="/" class="nav-brand">
@@ -40,7 +40,7 @@
 
   <div class="nav-user">
     <!-- Language toggle -->
-    <a href="/lang/{% if lang == 'en' %}te{% else %}en{% endif %}" class="btn-lang" title="Switch language">
+    <a href="/lang/{% if lang == 'en' %}te{% else %}en{% endif %}" class="btn-lang" title="Switch language" hx-boost="false">
       {% if lang == 'en' %}తె{% else %}EN{% endif %}
     </a>
 
@@ -50,14 +50,14 @@
       {% if user.role in ('admin', 'superadmin') %}
         <a href="/admin" class="btn-admin">Admin</a>
       {% endif %}
-      <a href="/logout" class="btn-logout">{% if lang == 'en' %}Logout{% else %}లాగ్అవుట్{% endif %}</a>
+      <a href="/logout" class="btn-logout" hx-boost="false">{% if lang == 'en' %}Logout{% else %}లాగ్అవుట్{% endif %}</a>
     {% else %}
       <a href="/login" class="btn-login">{% if lang == 'en' %}Login{% else %}లాగిన్{% endif %}</a>
     {% endif %}
   </div>
 </nav>
 
-<main class="main-content">
+<main class="main-content" id="main-content">
   {% block content %}{% endblock %}
 </main>
 
