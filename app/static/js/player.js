@@ -195,12 +195,9 @@ function highlightActiveNav() {
 
 highlightActiveNav();
 
-// Re-run page scripts and nav highlight after HTMX swaps
+// Re-run nav highlight after HTMX swaps
 document.addEventListener('htmx:afterSwap', () => {
   highlightActiveNav();
-  // Re-init chapterList if page has it
-  const scripts = document.getElementById('main-content')?.querySelectorAll('script');
-  if (scripts) scripts.forEach(s => { if (s.textContent.includes('chapterList')) eval(s.textContent); });
 });
 
 document.addEventListener('htmx:afterSettle', () => {

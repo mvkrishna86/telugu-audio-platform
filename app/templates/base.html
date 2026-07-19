@@ -59,6 +59,7 @@
 
 <main class="main-content" id="main-content">
   {% block content %}{% endblock %}
+  {% block scripts %}{% endblock %}
 </main>
 
 <div id="mini-player" class="mini-player hidden">
@@ -130,6 +131,5 @@
 </footer>
 
 <script src="/static/js/player.js"></script>
-{% block scripts %}{% endblock %}
 </body>
 </html>
