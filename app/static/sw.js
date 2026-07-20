@@ -1,4 +1,4 @@
-const CACHE = 'sraavani-v3';
+const CACHE = 'sraavani-v5';
 const SHELL = ['/', '/static/css/style.css', '/static/js/player.js', '/static/manifest.json'];
 
 self.addEventListener('install', e => {
