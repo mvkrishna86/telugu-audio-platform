@@ -34,6 +34,21 @@ async def health():
     return {"status": "ok"}
 
 
+@app.get("/supabase-health", include_in_schema=False)
+async def supabase_health():
+    import httpx
+    from app.config import SUPABASE_URL, SUPABASE_ANON_KEY
+    from fastapi.responses import JSONResponse
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            r = await client.get(f"{SUPABASE_URL}/auth/v1/health", headers={"apikey": SUPABASE_ANON_KEY})
+        if r.status_code == 200:
+            return {"status": "ok"}
+        return JSONResponse({"status": "error", "code": r.status_code}, status_code=502)
+    except Exception as e:
+        return JSONResponse({"status": "error", "detail": str(e)}, status_code=502)
+
+
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("app/static/icons/icon-192.png")
