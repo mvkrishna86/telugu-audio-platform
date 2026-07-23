@@ -29,12 +29,12 @@ app.include_router(admin_users.router)
 app.include_router(preferences.router)
 
 
-@app.get("/health", include_in_schema=False)
+@app.api_route("/health", methods=["GET", "HEAD"], include_in_schema=False)
 async def health():
     return {"status": "ok"}
 
 
-@app.get("/supabase-health", include_in_schema=False)
+@app.api_route("/supabase-health", methods=["GET", "HEAD"], include_in_schema=False)
 async def supabase_health():
     import httpx
     from app.config import SUPABASE_URL, SUPABASE_ANON_KEY
