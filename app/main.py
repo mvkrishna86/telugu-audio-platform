@@ -29,6 +29,11 @@ app.include_router(admin_users.router)
 app.include_router(preferences.router)
 
 
+@app.get("/health", include_in_schema=False)
+async def health():
+    return {"status": "ok"}
+
+
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("app/static/icons/icon-192.png")
